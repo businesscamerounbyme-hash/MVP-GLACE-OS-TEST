@@ -21,9 +21,9 @@ export async function GET(request: Request) {
 
     if (q) {
       whereClause.OR = [
-        { nom: { contains: q } },
-        { description: { contains: q } },
-        { sousCategorie: { contains: q } }
+        { nom: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+        { sousCategorie: { contains: q, mode: 'insensitive' } }
       ];
     }
 

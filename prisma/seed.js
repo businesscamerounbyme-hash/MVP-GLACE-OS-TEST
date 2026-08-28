@@ -17,7 +17,12 @@ async function main() {
   await prisma.utilisateur.deleteMany();
 
   console.log('--- Création des utilisateurs de référence ---');
-  const hashedAdminPassword = await bcrypt.hash('admin123', 10);
+  // Mot de passe admin fourni par l'environnement : le compte est exposé publiquement
+  // une fois le site déployé, donc aucune valeur par défaut n'est codée ici.
+  if (!process.env.SEED_ADMIN_PASSWORD) {
+    throw new Error('SEED_ADMIN_PASSWORD est requis pour créer le compte administrateur.');
+  }
+  const hashedAdminPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10);
   const hashedModoPassword = await bcrypt.hash('modo123', 10);
   const hashedSupplierPassword = await bcrypt.hash('fournisseur123', 10);
   const hashedMemberPassword = await bcrypt.hash('membre123', 10);

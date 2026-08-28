@@ -31,10 +31,10 @@ export async function GET(request: Request) {
 
     if (q) {
       whereClause.OR = [
-        { nom: { contains: q } },
-        { description: { contains: q } },
-        { quartier: { contains: q } },
-        { offres: { some: { produitReference: { nom: { contains: q } } } } }
+        { nom: { contains: q, mode: 'insensitive' } },
+        { description: { contains: q, mode: 'insensitive' } },
+        { quartier: { contains: q, mode: 'insensitive' } },
+        { offres: { some: { produitReference: { nom: { contains: q, mode: 'insensitive' } } } } }
       ];
     }
 
