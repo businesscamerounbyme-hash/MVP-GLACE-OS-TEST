@@ -1,0 +1,165 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Utilisateur {
+  id           String      @id @default(cuid())
+  nom          String
+  email        String      @unique
+  telephone    String
+  motDePasse   String
+  pays         String
+  ville        String
+  role         String      @default("MEMBER") // ADMIN, MODERATOR, SUPPLIER, MEMBER
+  dateCreation DateTime    @default(now())
+
+  boutiques            Boutique[]
+  avis                 Avis[]
+  abonnementsMembre    AbonnementMembre[]
+  actionsModeration    JournalModeration[]
+}
+
+model Boutique {
+  id             String      @id @default(cuid())
+  utilisateurId  String
+  nom            String
+  description    String
+  pays           String
+  ville          String
+  quartier       String
+  latitude       Float
+  longitude      Float
+  telephone      String
+  whatsapp       String
+  statut         String      @default("EN_ATTENTE") // EN_ATTENTE, PUBLIEE, REJETEE, INACTIVE
+  badgeCertifie  Boolean     @default(false)
+  noteMoyenne    Float       @default(0.0)
+  dateValidation DateTime?
+  dateCreation   DateTime    @default(now())
+
+  utilisateur           Utilisateur             @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  offres                Offre[]
+  propositionsProduits  PropositionProduit[]
+  avis                  Avis[]
+  abonnements           AbonnementFournisseur[]
+  demandesBadges        DemandeBadge[]
+}
+
+model ProduitReference {
+  id               String   @id @default(cuid())
+  nom              String   @unique
+  categorie        String   // INGREDIENT, EMBALLAGE, EQUIPEMENT
+  sousCategorie    String   // Stabilisants, Émulsifiants, Arômes, Pots, Cuillères, Turbines, etc.
+  unitesAutorisees String   // Ex: "kg, sac 25kg, boîte 1kg, litre" (séparées par virgules)
+  description      String?
+  image            String?
+  creePar          String?  // Id de l'admin ou system
+  dateCreation     DateTime @default(now())
+
+  offres Offre[]
+}
+
+model PropositionProduit {
+  id            String   @id @default(cuid())
+  boutiqueId    String
+  nom           String
+  categorie     String
+  sousCategorie String
+  description   String?
+  statut        String   @default("EN_ATTENTE") // EN_ATTENTE, VALIDE, REJETE
+  motifRejet    String?
+  dateCreation  DateTime @default(now())
+
+  boutique Boutique @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+}
+
+model Offre {
+  id                  String   @id @default(cuid())
+  boutiqueId          String
+  produitReferenceId  String
+  prix                Float
+  devise              String   @default("XOF") // XOF, XAF, GNF, USD
+  unite               String   // ex: "kg", "sac 25kg", "litre"
+  quantiteDisponible  Float    @default(1.0)
+  photoUrl            String?
+  description         String?
+  dateCreation        DateTime @default(now())
+  dateMiseAJour       DateTime @updatedAt
+
+  boutique         Boutique         @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+  produitReference ProduitReference @relation(fields: [produitReferenceId], references: [id], onDelete: Restrict)
+}
+
+model Avis {
+  id            String   @id @default(cuid())
+  boutiqueId    String
+  utilisateurId String
+  note          Int      // 1 à 5
+  commentaire   String
+  photoUrl      String?
+  statut        String   @default("EN_ATTENTE") // EN_ATTENTE, PUBLIE, REJETE
+  dateCreation  DateTime @default(now())
+
+  boutique    Boutique    @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+}
+
+model AbonnementFournisseur {
+  id                    String    @id @default(cuid())
+  boutiqueId            String
+  statut                String    @default("ACTIF") // ACTIF, EXPIRE, EN_ATTENTE
+  dateDebut             DateTime  @default(now())
+  dateFin               DateTime
+  montant               Float
+  devise                String    @default("XOF")
+  referenceMobileMoney  String
+  operateur             String    // ORANGE_MONEY, MTN_MOMO, MOOV_MONEY, WAVE
+  dateCreation          DateTime  @default(now())
+
+  boutique Boutique @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+}
+
+model AbonnementMembre {
+  id                    String    @id @default(cuid())
+  utilisateurId         String
+  statut                String    @default("ACTIF") // ACTIF, EXPIRE, EN_ATTENTE
+  dateDebut             DateTime  @default(now())
+  dateFin               DateTime
+  montant               Float
+  devise                String    @default("XOF")
+  referenceMobileMoney  String
+  operateur             String    // ORANGE_MONEY, MTN_MOMO, MOOV_MONEY, WAVE
+  dateCreation          DateTime  @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+}
+
+model DemandeBadge {
+  id                String    @id @default(cuid())
+  boutiqueId        String
+  statut            String    @default("EN_ATTENTE") // EN_ATTENTE, PAYEE, VALIDEE, REJETEE
+  montant           Float     @default(15000)
+  referencePaiement String?
+  operateur         String?
+  dateDemande       DateTime  @default(now())
+  dateValidation    DateTime?
+
+  boutique Boutique @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+}
+
+model JournalModeration {
+  id           String   @id @default(cuid())
+  cibleId      String
+  typeCible    String   // BOUTIQUE, PROPOSITION_PRODUIT, AVIS, DEMANDE_BADGE, UTILISATEUR
+  moderateurId String
+  action       String   // APPROUVER, REJETER, SUSPENDRE, MODIFIER_ROLE
+  motif        String?
+  dateAction   DateTime @default(now())
+
+  moderateur Utilisateur @relation(fields: [moderateurId], references: [id], onDelete: Cascade)
+}
