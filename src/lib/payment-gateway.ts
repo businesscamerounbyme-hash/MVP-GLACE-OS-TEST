@@ -2,7 +2,13 @@ import { prisma } from './prisma';
 
 export interface MobileMoneyPaymentRequest {
   type: 'ABONNEMENT_FOURNISSEUR' | 'ABONNEMENT_MEMBRE' | 'DEMANDE_BADGE';
-  targetId: string; // boutiqueId ou utilisateurId
+  /**
+   * Identifiant de la cible : utilisateur pour un abonnement membre, boutique sinon.
+   * Toujours dérivé de la session ou validé en propriété par l'appelant — jamais lu
+   * directement dans le corps de la requête.
+   */
+  cibleId: string;
+  /** Montant issu du barème serveur (src/lib/tarifs.ts), jamais du client. */
   montant: number;
   devise?: string;
   operateur: 'ORANGE_MONEY' | 'MTN_MOMO' | 'MOOV_MONEY' | 'WAVE';
@@ -41,7 +47,7 @@ export class MobileMoneyService {
         // Enregistrer / renouveler l'abonnement fournisseur
         await prisma.abonnementFournisseur.create({
           data: {
-            boutiqueId: req.targetId,
+            boutiqueId: req.cibleId,
             statut: 'ACTIF',
             dateDebut: now,
             dateFin: expiryDate,
@@ -54,11 +60,11 @@ export class MobileMoneyService {
 
         // Si la boutique était en attente ou inactive et a déjà été validée, on s'assure qu'elle est publiée
         const boutique = await prisma.boutique.findUnique({
-          where: { id: req.targetId },
+          where: { id: req.cibleId },
         });
         if (boutique && boutique.statut === 'INACTIVE' && boutique.dateValidation) {
           await prisma.boutique.update({
-            where: { id: req.targetId },
+            where: { id: req.cibleId },
             data: { statut: 'PUBLIEE' },
           });
         }
@@ -73,7 +79,7 @@ export class MobileMoneyService {
         // Enregistrer / renouveler l'abonnement membre
         await prisma.abonnementMembre.create({
           data: {
-            utilisateurId: req.targetId,
+            utilisateurId: req.cibleId,
             statut: 'ACTIF',
             dateDebut: now,
             dateFin: expiryDate,
@@ -94,7 +100,7 @@ export class MobileMoneyService {
         // Enregistrer le paiement du badge certifié (en attente de vérification documents)
         await prisma.demandeBadge.create({
           data: {
-            boutiqueId: req.targetId,
+            boutiqueId: req.cibleId,
             statut: 'PAYEE',
             montant: req.montant,
             referencePaiement: reference,
@@ -121,7 +127,9 @@ export class MobileMoneyService {
       return {
         success: false,
         reference,
-        message: err?.message || 'Erreur technique lors du traitement du paiement.',
+        // Pas de err.message vers le client : cela exposerait la structure interne
+        // (contraintes Prisma, noms de tables) à un appelant non authentifié à ce stade.
+        message: 'Erreur technique lors du traitement du paiement.',
         statut: 'ECHEC',
       };
     }

@@ -411,14 +411,14 @@ export default function BoutiqueDetailPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-300">
-                      {av.utilisateur?.nom?.slice(0, 2).toUpperCase() || 'GL'}
+                      {av.auteur?.nom?.slice(0, 2).toUpperCase() || 'GL'}
                     </div>
                     <div>
                       <span className="text-xs font-bold text-white block">
-                        {av.utilisateur?.nom}
+                        {av.auteur?.nom}
                       </span>
                       <span className="text-[10px] text-slate-500">
-                        {av.utilisateur?.ville || 'Glacier'}
+                        {av.auteur?.ville || 'Glacier'}
                       </span>
                     </div>
                   </div>

@@ -58,11 +58,12 @@ export default function MobileMoneyModal({
       const res = await fetch('/api/paiements/momo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Ni le montant ni la cible d'un abonnement membre ne sont transmis : le serveur
+        // applique son propre barème et déduit la cible de la session. `boutiqueId` n'est
+        // utile que pour les paiements liés à une boutique, et sa propriété est vérifiée.
         body: JSON.stringify({
           type,
-          targetId,
-          montant,
-          devise: devise === 'FCFA' ? 'XOF' : devise,
+          boutiqueId: type === 'ABONNEMENT_MEMBRE' ? undefined : targetId,
           operateur,
           numeroTelephone: telephone
         })

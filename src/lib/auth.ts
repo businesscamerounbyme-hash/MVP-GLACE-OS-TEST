@@ -4,8 +4,23 @@ import { cookies } from 'next/headers';
 import { prisma } from './prisma';
 import { UserSession } from '@/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'glace-os-secret-mvp-african-ice-cream-2026';
 const TOKEN_NAME = 'glace_session_token';
+
+/**
+ * Aucun secret de repli : une valeur codée en dur dans le dépôt permettrait à
+ * quiconque le lit de forger un jeton de session administrateur.
+ * La lecture est différée (et non faite au chargement du module) pour qu'un build
+ * sans variables d'environnement n'échoue pas ; l'exécution, elle, refuse de signer.
+ */
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      "JWT_SECRET est absent de l'environnement : impossible de signer ou vérifier une session."
+    );
+  }
+  return secret;
+}
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
@@ -16,12 +31,15 @@ export async function comparePassword(password: string, hash: string): Promise<b
 }
 
 export function generateToken(payload: object): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '30d' });
 }
 
 export function verifyToken(token: string): any {
+  // Hors du try : un secret manquant est une erreur de configuration, pas un jeton
+  // invalide, et doit remonter au lieu d'être confondue avec une session anonyme.
+  const secret = getJwtSecret();
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, secret);
   } catch (error) {
     return null;
   }

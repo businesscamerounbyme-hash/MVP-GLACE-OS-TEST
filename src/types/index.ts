@@ -12,6 +12,8 @@ export type StatutAbonnement = 'ACTIF' | 'EXPIRE' | 'EN_ATTENTE';
 
 export type OperateurMobileMoney = 'ORANGE_MONEY' | 'MTN_MOMO' | 'MOOV_MONEY' | 'WAVE';
 
+export type TypePaiement = 'ABONNEMENT_FOURNISSEUR' | 'ABONNEMENT_MEMBRE' | 'DEMANDE_BADGE';
+
 export interface UserSession {
   id: string;
   nom: string;
