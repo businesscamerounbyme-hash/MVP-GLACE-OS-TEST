@@ -192,3 +192,16 @@ model Paiement {
   @@index([statut])
   @@index([utilisateurId])
 }
+
+/// Tentatives de connexion, pour limiter le bourrage de mots de passe.
+/// Stockees en base et non en memoire : chaque invocation serverless demarre avec un
+/// process neuf, un compteur en RAM ne survivrait donc a aucune requete.
+model TentativeConnexion {
+  id         String   @id @default(cuid())
+  /// Cle de regroupement : "email:<adresse>" ou "ip:<adresse>".
+  cle        String
+  reussie    Boolean  @default(false)
+  dateEssai  DateTime @default(now())
+
+  @@index([cle, dateEssai])
+}

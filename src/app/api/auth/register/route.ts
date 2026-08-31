@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { hashPassword, generateToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { VILLES_AFRIQUE } from '@/lib/geo';
+import { estEmailValide, verifierMotDePasse } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
@@ -32,13 +33,31 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!estEmailValide(email)) {
+      return NextResponse.json(
+        { success: false, message: 'Adresse email invalide.' },
+        { status: 400 }
+      );
+    }
+
+    const verif = verifierMotDePasse(motDePasse);
+    if (!verif.ok) {
+      return NextResponse.json({ success: false, message: verif.message }, { status: 400 });
+    }
+
     const existingUser = await prisma.utilisateur.findUnique({
       where: { email: email.toLowerCase().trim() }
     });
 
     if (existingUser) {
+      // Message volontairement neutre : confirmer l'existence d'un compte permettrait
+      // d'énumérer les adresses inscrites avant de s'attaquer à leurs mots de passe.
       return NextResponse.json(
-        { success: false, message: 'Un compte avec cet email existe déjà.' },
+        {
+          success: false,
+          message:
+            'Inscription impossible avec ces informations. Si vous avez déjà un compte, connectez-vous.',
+        },
         { status: 400 }
       );
     }
@@ -121,7 +140,9 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Erreur inscription:', error);
     return NextResponse.json(
-      { success: false, message: error?.message || 'Erreur lors de l’inscription.' },
+      // Pas de error.message : cela exposerait la structure interne (contraintes
+      // Prisma, noms de colonnes) a un appelant anonyme.
+      { success: false, message: 'Erreur lors de l’inscription.' },
       { status: 500 }
     );
   }

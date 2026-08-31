@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { comparePassword, generateToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { ipDepuisRequete, verifierLimite, enregistrerTentative } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
@@ -14,8 +15,16 @@ export async function POST(request: Request) {
       );
     }
 
+    const emailNormalise = String(email).toLowerCase().trim();
+    const ip = ipDepuisRequete(request);
+
+    const limite = await verifierLimite(emailNormalise, ip);
+    if (!limite.autorise) {
+      return NextResponse.json({ success: false, message: limite.message }, { status: 429 });
+    }
+
     const user = await prisma.utilisateur.findUnique({
-      where: { email: email.toLowerCase().trim() },
+      where: { email: emailNormalise },
       include: {
         boutiques: { take: 1 },
         abonnementsMembre: {
@@ -29,6 +38,7 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
+      await enregistrerTentative(emailNormalise, ip, false);
       return NextResponse.json(
         { success: false, message: 'Identifiants incorrects.' },
         { status: 401 }
@@ -37,11 +47,14 @@ export async function POST(request: Request) {
 
     const isValid = await comparePassword(motDePasse, user.motDePasse);
     if (!isValid) {
+      await enregistrerTentative(emailNormalise, ip, false);
       return NextResponse.json(
         { success: false, message: 'Identifiants incorrects.' },
         { status: 401 }
       );
     }
+
+    await enregistrerTentative(emailNormalise, ip, true);
 
     const token = generateToken({
       userId: user.id,

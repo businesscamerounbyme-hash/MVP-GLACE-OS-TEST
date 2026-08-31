@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { estRoleValide } from '@/lib/validation';
 
 export async function POST(request: Request) {
   try {
@@ -155,12 +156,26 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, message: 'Seul le Super Admin peut modifier les rôles' }, { status: 403 });
       }
 
-      if (roleNouveau) {
-        await prisma.utilisateur.update({
-          where: { id: cibleId },
-          data: { role: roleNouveau }
-        });
+      // Sans liste blanche, n’importe quelle chaine devenait un role. Un role inconnu
+      // ne correspond a aucune regle d’autorisation : le compte deviendrait inclassable.
+      if (!estRoleValide(roleNouveau)) {
+        return NextResponse.json(
+          { success: false, message: 'Role invalide.' },
+          { status: 400 }
+        );
       }
+
+      if (cibleId === user.id) {
+        return NextResponse.json(
+          { success: false, message: 'Vous ne pouvez pas modifier votre propre role.' },
+          { status: 400 }
+        );
+      }
+
+      await prisma.utilisateur.update({
+        where: { id: cibleId },
+        data: { role: roleNouveau }
+      });
     }
 
     // Enregistrer dans le Journal d'audit de modération
@@ -182,7 +197,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Erreur action modération:', error);
     return NextResponse.json(
-      { success: false, message: error?.message || 'Erreur lors de l’action de modération.' },
+      { success: false, message: 'Erreur lors de l’action de modération.' },
       { status: 500 }
     );
   }
