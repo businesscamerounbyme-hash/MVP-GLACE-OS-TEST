@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { requireUser, requireBoutiqueOwnership, authErrorResponse } from '@/lib/guard';
-import { getTarif } from '@/lib/tarifs';
-import { MobileMoneyService } from '@/lib/payment-gateway';
+import { ouvrirPaiement } from '@/lib/payment/service';
 import { TypePaiement, OperateurMobileMoney } from '@/types';
 
 const TYPES_VALIDES: TypePaiement[] = [
@@ -18,12 +17,16 @@ const OPERATEURS_VALIDES: OperateurMobileMoney[] = [
   'WAVE',
 ];
 
+/**
+ * Ouvre un paiement Mobile Money. N'accorde aucun droit : l'abonnement ou le badge
+ * ne sera créé que lorsque l'agrégateur aura confirmé l'encaissement sur
+ * /api/paiements/webhook.
+ */
 export async function POST(request: Request) {
   try {
     const user = requireUser(await getCurrentUser());
 
-    const body = await request.json();
-    const { type, boutiqueId, operateur, numeroTelephone } = body;
+    const { type, boutiqueId, operateur, numeroTelephone } = await request.json();
 
     if (!TYPES_VALIDES.includes(type)) {
       return NextResponse.json(
@@ -46,8 +49,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // La cible n'est jamais lue telle quelle dans la requête : elle est dérivée de la
-    // session pour un abonnement membre, et vérifiée en propriété pour une boutique.
+    // La cible n'est jamais lue telle quelle : dérivée de la session pour un abonnement
+    // membre, vérifiée en propriété pour tout ce qui concerne une boutique.
     let cibleId: string;
     if (type === 'ABONNEMENT_MEMBRE') {
       cibleId = user.id;
@@ -62,14 +65,10 @@ export async function POST(request: Request) {
       cibleId = boutique.id;
     }
 
-    // Le montant vient du barème serveur, jamais du client.
-    const tarif = getTarif(type);
-
-    const resultat = await MobileMoneyService.processPayment({
+    const resultat = await ouvrirPaiement({
+      utilisateurId: user.id,
       type,
       cibleId,
-      montant: tarif.montant,
-      devise: tarif.devise,
       operateur,
       numeroTelephone: String(numeroTelephone).trim(),
       userEmail: user.email,
@@ -82,7 +81,7 @@ export async function POST(request: Request) {
 
     console.error('Erreur API Paiement MoMo:', error);
     return NextResponse.json(
-      { success: false, message: 'Erreur lors du paiement Mobile Money.' },
+      { success: false, message: 'Erreur lors de l’initiation du paiement.' },
       { status: 500 }
     );
   }

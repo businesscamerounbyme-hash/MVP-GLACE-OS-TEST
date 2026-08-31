@@ -23,6 +23,7 @@ model Utilisateur {
   avis                 Avis[]
   abonnementsMembre    AbonnementMembre[]
   actionsModeration    JournalModeration[]
+  paiements            Paiement[]
 }
 
 model Boutique {
@@ -163,4 +164,31 @@ model JournalModeration {
   dateAction   DateTime @default(now())
 
   moderateur Utilisateur @relation(fields: [moderateurId], references: [id], onDelete: Cascade)
+}
+
+/// Transaction Mobile Money. Source de verite du paiement : aucun droit (abonnement,
+/// badge) n est accorde sans un Paiement passe a REUSSI par une confirmation verifiee
+/// de l agregateur. La reponse du navigateur ne fait jamais autorite.
+model Paiement {
+  id               String    @id @default(cuid())
+  utilisateurId    String
+  type             String    // ABONNEMENT_MEMBRE, ABONNEMENT_FOURNISSEUR, DEMANDE_BADGE
+  cibleId          String    // utilisateurId ou boutiqueId selon le type
+  montant          Float     // issu du bareme serveur, jamais du client
+  devise           String    @default("XOF")
+  operateur        String    // ORANGE_MONEY, MTN_MOMO, MOOV_MONEY, WAVE
+  numeroTelephone  String
+  statut           String    @default("INITIE") // INITIE, EN_ATTENTE, REUSSI, ECHOUE, EXPIRE
+  referenceInterne String    @unique // cle d idempotence cote GLACE OS
+  referencePSP     String?   @unique // identifiant chez l agregateur
+  payloadWebhook   String?   // trace brute recue, pour audit et litiges
+  motifEchec       String?
+  dateCreation     DateTime  @default(now())
+  dateMiseAJour    DateTime  @updatedAt
+  dateConfirmation DateTime?
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+
+  @@index([statut])
+  @@index([utilisateurId])
 }

@@ -111,17 +111,19 @@ export default function MobileMoneyModal({
 
         {successData ? (
           <div className="py-6 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto animate-bounce">
-              <CheckCircle2 className="w-10 h-10" />
+            <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center mx-auto">
+              <Smartphone className="w-9 h-9" />
             </div>
-            <h3 className="text-xl font-extrabold text-white">Paiement Réussi !</h3>
+            <h3 className="text-xl font-extrabold text-white">Paiement en attente</h3>
             <p className="text-sm text-slate-300 max-w-xs mx-auto">
               {successData.message}
             </p>
             <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono text-amber-400">
               Réf : {successData.reference}
             </div>
-            <p className="text-xs text-slate-400">Actualisation automatique des accès...</p>
+            <p className="text-xs text-slate-400">
+              Vos accès seront débloqués dès la confirmation de l’opérateur.
+            </p>
           </div>
         ) : (
           <div>
