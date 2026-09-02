@@ -85,7 +85,12 @@ export async function POST(request: Request) {
 
     // Purge de l'ancienne image, sans faire échouer la requête si elle a déjà disparu.
     if (precedent?.photoUrl?.includes('.public.blob.vercel-storage.com')) {
-      await del(precedent.photoUrl).catch(() => undefined);
+      // Une suppression qui echoue ne doit pas faire echouer la requete — la nouvelle
+      // photo est deja en place — mais elle est tracee, sinon des fichiers orphelins
+      // s accumulent dans le stockage sans que rien ne le signale.
+      await del(precedent.photoUrl).catch((e) =>
+        console.error("Blob orphelin, suppression echouee:", precedent.photoUrl, e)
+      );
     }
 
     return NextResponse.json({ success: true, photoUrl: blob.url });
@@ -116,7 +121,9 @@ export async function DELETE() {
     });
 
     if (actuel?.photoUrl?.includes('.public.blob.vercel-storage.com')) {
-      await del(actuel.photoUrl).catch(() => undefined);
+      await del(actuel.photoUrl).catch((e) =>
+        console.error("Blob orphelin, suppression echouee:", actuel.photoUrl, e)
+      );
     }
 
     return NextResponse.json({ success: true, message: 'Photo supprimée.' });
