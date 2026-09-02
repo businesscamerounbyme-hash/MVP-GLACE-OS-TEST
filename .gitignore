@@ -39,3 +39,6 @@ yarn-error.log*
 
 # agent skills : liens symboliques en chemins absolus, propres a la machine
 .claude/
+
+# memo personnel : contient des pointeurs vers des secrets, ne doit pas etre publie
+MEMO.md
