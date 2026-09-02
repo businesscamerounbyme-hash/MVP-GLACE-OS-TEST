@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -30,6 +30,39 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const menuUtilisateur = useRef<HTMLDivElement>(null);
+  const menuVille = useRef<HTMLDivElement>(null);
+
+  // Fermeture des menus au clic extérieur et à la touche Échap : sans cela un menu
+  // ouvert reste affiché par-dessus la page jusqu'à ce qu'on reclique exactement
+  // sur le bouton qui l'a ouvert.
+  useEffect(() => {
+    if (!isDropdownOpen && !isCityDropdownOpen) return;
+
+    const auClic = (e: MouseEvent) => {
+      const cible = e.target as Node;
+      if (isDropdownOpen && menuUtilisateur.current && !menuUtilisateur.current.contains(cible)) {
+        setIsDropdownOpen(false);
+      }
+      if (isCityDropdownOpen && menuVille.current && !menuVille.current.contains(cible)) {
+        setIsCityDropdownOpen(false);
+      }
+    };
+
+    const auClavier = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsDropdownOpen(false);
+        setIsCityDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', auClic);
+    document.addEventListener('keydown', auClavier);
+    return () => {
+      document.removeEventListener('mousedown', auClic);
+      document.removeEventListener('keydown', auClavier);
+    };
+  }, [isDropdownOpen, isCityDropdownOpen]);
 
   useEffect(() => {
     // Charger la session utilisateur
@@ -84,7 +117,7 @@ export default function Navbar() {
           {/* Search bar & City Selector (Desktop / Tablet) */}
           <div className="hidden md:flex flex-1 max-w-xl items-center gap-2">
             {/* Ville Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={menuVille}>
               <button
                 type="button"
                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
@@ -139,7 +172,7 @@ export default function Navbar() {
           {/* User Nav / Auth Controls */}
           <div className="flex items-center gap-2">
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={menuUtilisateur}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition"

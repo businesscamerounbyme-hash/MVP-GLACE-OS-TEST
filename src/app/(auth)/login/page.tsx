@@ -1,12 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Sparkles, Lock, Mail, ArrowRight, Loader2, ShieldCheck, Store, User, Zap } from 'lucide-react';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <FormulaireConnexion />
+    </Suspense>
+  );
+}
+
+function FormulaireConnexion() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +40,14 @@ export default function LoginPage() {
         return;
       }
 
-      router.push('/');
+      // Le middleware transmet la page demandee dans `suite`. Sans cela, un
+      // utilisateur renvoye vers la connexion depuis /profil atterrissait sur
+      // l'accueil et devait renaviguer a la main.
+      // Seuls les chemins internes sont acceptes : une URL absolue permettrait
+      // de rediriger la victime vers un site tiers apres une connexion reussie.
+      const suite = searchParams.get('suite');
+      const destination = suite && suite.startsWith('/') && !suite.startsWith('//') ? suite : '/';
+      router.push(destination);
       router.refresh();
     } catch (err: any) {
       setError('Erreur de connexion au serveur.');
