@@ -13,7 +13,8 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
-import { VILLES_AFRIQUE } from '@/lib/geo';
+import { PAYS_AFRIQUE, villesDuPays } from '@/lib/geo';
+import ChampTelephone from '@/components/forms/ChampTelephone';
 import { initiales } from '@/lib/nom';
 
 type Message = { ton: 'ok' | 'erreur'; texte: string } | null;
@@ -269,38 +270,50 @@ export default function ProfilPage() {
             />
           </div>
 
-          <Champ
-            label="Téléphone"
-            value={infos.telephone}
+          <ChampTelephone
+            valeur={infos.telephone}
             onChange={(v) => setInfos({ ...infos, telephone: v })}
-            placeholder="+221 77 000 00 00"
+            paysParDefaut={infos.pays}
+            label="Téléphone"
             requis
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Champ
-              label="Pays"
-              value={infos.pays}
-              onChange={(v) => setInfos({ ...infos, pays: v })}
-              requis
-            />
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-300 mb-1.5">
+                Pays <span className="text-amber-400">*</span>
+              </label>
+              <select
+                value={infos.pays}
+                onChange={(e) => {
+                  // Changer de pays reinitialise la ville sur la premiere du pays :
+                  // conserver l ancienne donnerait des couples incoherents (Dakar/Mali).
+                  const nouveauPays = e.target.value;
+                  const premiere = villesDuPays(nouveauPays)[0];
+                  setInfos({ ...infos, pays: nouveauPays, ville: premiere ? premiere.nom : '' });
+                }}
+                className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
+              >
+                {PAYS_AFRIQUE.map((p) => (
+                  <option key={p.code} value={p.nom}>
+                    {p.drapeau} {p.nom}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="block text-[11px] font-semibold text-slate-300 mb-1.5">
                 Ville <span className="text-amber-400">*</span>
               </label>
               <select
                 value={infos.ville}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  const info = VILLES_AFRIQUE.find((x) => x.nom === v);
-                  setInfos({ ...infos, ville: v, pays: info ? info.pays : infos.pays });
-                }}
+                onChange={(e) => setInfos({ ...infos, ville: e.target.value })}
                 className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
               >
-                <option value={infos.ville}>{infos.ville || 'Choisir...'}</option>
-                {VILLES_AFRIQUE.filter((v) => v.nom !== infos.ville).map((v) => (
+                {villesDuPays(infos.pays).map((v) => (
                   <option key={v.nom} value={v.nom}>
-                    {v.nom} ({v.pays})
+                    {v.nom}
                   </option>
                 ))}
               </select>

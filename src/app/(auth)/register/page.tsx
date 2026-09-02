@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { VILLES_AFRIQUE } from '@/lib/geo';
+import { VILLES_AFRIQUE, PAYS_AFRIQUE, villesDuPays } from '@/lib/geo';
+import ChampTelephone from '@/components/forms/ChampTelephone';
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'MEMBER' | 'SUPPLIER'>('MEMBER');
@@ -177,24 +178,19 @@ export default function RegisterPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">Téléphone / WhatsApp</label>
-            <input
-              type="tel"
-              required
-              placeholder="+225 07 12 34 56 78"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-            />
-          </div>
+          <ChampTelephone
+            valeur={telephone}
+            onChange={setTelephone}
+            paysParDefaut={pays}
+            requis
+          />
 
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1.5">Mot de passe</label>
             <input
               type="password"
               required
-              placeholder="Minimum 6 caractères"
+              placeholder="8 caractères min., lettre et chiffre"
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
@@ -206,32 +202,37 @@ export default function RegisterPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1.5">Pays</label>
+            {/* Liste construite depuis PAYS_AFRIQUE : elle était auparavant recopiée
+                en dur ici, donc ajouter un pays demandait de penser à deux endroits. */}
             <select
               value={pays}
               onChange={(e) => handleCountryChange(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
             >
-              <option value="Côte d'Ivoire">Côte d'Ivoire</option>
-              <option value="Sénégal">Sénégal</option>
-              <option value="Cameroun">Cameroun</option>
-              <option value="Bénin">Bénin</option>
-              <option value="Togo">Togo</option>
-              <option value="Burkina Faso">Burkina Faso</option>
-              <option value="Mali">Mali</option>
-              <option value="Guinée">Guinée</option>
+              {PAYS_AFRIQUE.map((p) => (
+                <option key={p.code} value={p.nom}>
+                  {p.drapeau} {p.nom}
+                </option>
+              ))}
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1.5">Ville</label>
-            <input
-              type="text"
+            {/* Champ libre auparavant : une faute de frappe créait une ville fantôme,
+                invisible des filtres de recherche qui comparent le nom exact. */}
+            <select
               required
-              placeholder="Ex: Abidjan, Dakar..."
               value={ville}
               onChange={(e) => setVille(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
-            />
+            >
+              {villesDuPays(pays).map((v) => (
+                <option key={v.nom} value={v.nom}>
+                  {v.nom}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -269,16 +270,12 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">Numéro WhatsApp direct</label>
-                <input
-                  type="tel"
-                  placeholder="+2250712345678"
-                  value={whatsappBoutique}
-                  onChange={(e) => setWhatsappBoutique(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-400"
-                />
-              </div>
+              <ChampTelephone
+                valeur={whatsappBoutique}
+                onChange={setWhatsappBoutique}
+                paysParDefaut={pays}
+                label="Numéro WhatsApp direct"
+              />
             </div>
 
             <div>

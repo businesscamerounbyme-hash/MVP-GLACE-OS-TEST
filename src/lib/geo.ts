@@ -99,3 +99,41 @@ export const VILLES_AFRIQUE: AfricanCity[] = [
     quartiers: ['Kaloum', 'Dixinn', 'Ratoma', 'Matam', 'Matoto', 'Kipé']
   }
 ];
+
+export interface PaysAfrique {
+  nom: string;
+  code: string;
+  indicatif: string;
+  drapeau: string;
+}
+
+/**
+ * Pays couverts par la marketplace, avec indicatif telephonique et drapeau.
+ *
+ * L ordre suit la couverture reelle : les pays ou GLACE OS compte deja des boutiques
+ * apparaissent en premier, pour eviter a la majorite des inscrits de faire defiler.
+ */
+// Les noms reprennent exactement ceux de VILLES_AFRIQUE, accents compris : le
+// filtrage des villes compare ces chaînes, une graphie divergente viderait la liste.
+export const PAYS_AFRIQUE: PaysAfrique[] = [
+  { nom: "Côte d'Ivoire", code: 'CI', indicatif: '+225', drapeau: '🇨🇮' },
+  { nom: 'Sénégal', code: 'SN', indicatif: '+221', drapeau: '🇸🇳' },
+  { nom: 'Cameroun', code: 'CM', indicatif: '+237', drapeau: '🇨🇲' },
+  { nom: 'Bénin', code: 'BJ', indicatif: '+229', drapeau: '🇧🇯' },
+  { nom: 'Togo', code: 'TG', indicatif: '+228', drapeau: '🇹🇬' },
+  { nom: 'Burkina Faso', code: 'BF', indicatif: '+226', drapeau: '🇧🇫' },
+  { nom: 'Mali', code: 'ML', indicatif: '+223', drapeau: '🇲🇱' },
+  { nom: 'Guinée', code: 'GN', indicatif: '+224', drapeau: '🇬🇳' },
+];
+
+/** Retrouve un pays par son nom, en tolerant les accents et la casse. */
+export function trouverPays(nom: string): PaysAfrique | undefined {
+  const normalise = (v: string) =>
+    v.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]/gi, "").toLowerCase();
+  return PAYS_AFRIQUE.find((p) => normalise(p.nom) === normalise(nom));
+}
+
+/** Villes disponibles pour un pays donne. */
+export function villesDuPays(pays: string) {
+  return VILLES_AFRIQUE.filter((v) => v.pays === pays);
+}
