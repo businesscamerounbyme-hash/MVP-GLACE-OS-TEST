@@ -232,3 +232,21 @@ model ReinitialisationMotDePasse {
   @@index([utilisateurId])
   @@index([expiration])
 }
+
+/// Marches ouverts a la creation de boutique.
+///
+/// Tous les pays africains sont visibles sur le site, mais un fournisseur ne peut
+/// enregistrer une boutique que dans un pays ouvert par l administrateur. Cela evite
+/// d afficher une carte vide dans des pays ou aucun approvisionnement n existe encore.
+///
+/// L absence de ligne vaut "ferme" : ouvrir un marche est un acte explicite.
+model MarchePays {
+  /// Code ISO 3166-1 alpha-2, cle canonique cote application.
+  code           String    @id
+  ouvert         Boolean   @default(false)
+  dateOuverture  DateTime?
+  modifiePar     String?
+  dateMiseAJour  DateTime  @updatedAt
+
+  @@index([ouvert])
+}

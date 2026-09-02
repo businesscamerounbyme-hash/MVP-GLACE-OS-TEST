@@ -4,6 +4,7 @@ import { hashPassword, generateToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 import { estEmailValide, verifierMotDePasse } from '@/lib/validation';
+import { paysParNom } from '@/lib/pays';
 
 export async function POST(request: Request) {
   try {
@@ -61,6 +62,31 @@ export async function POST(request: Request) {
         },
         { status: 400 }
       );
+    }
+
+    // Un fournisseur ne peut s'installer que dans un marché ouvert. Le contrôle est ici
+    // et pas seulement dans le menu déroulant : une liste filtrée côté client se
+    // contourne en postant directement sur cette route.
+    if (role === 'SUPPLIER') {
+      const paysCible = paysParNom(pays);
+      if (!paysCible) {
+        return NextResponse.json(
+          { success: false, message: 'Pays non reconnu.' },
+          { status: 400 }
+        );
+      }
+      const marche = await prisma.marchePays.findUnique({ where: { code: paysCible.code } });
+      if (!marche?.ouvert) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              'GLACE OS n’est pas encore ouvert aux fournisseurs dans ce pays. ' +
+              'Inscrivez-vous comme membre : nous vous préviendrons à l’ouverture.',
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const hashedPassword = await hashPassword(motDePasse);

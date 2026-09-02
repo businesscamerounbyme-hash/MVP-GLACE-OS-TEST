@@ -18,9 +18,11 @@ import {
   Phone, 
   UserCheck, 
   ChevronRight,
-  Filter
+  Filter,
+  Globe,
 } from 'lucide-react';
 import { UserSession } from '@/types';
+import GestionMarches from '@/components/admin/GestionMarches';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -41,7 +43,7 @@ export default function AdminDashboardPage() {
     utilisateurs: []
   });
 
-  const [activeTab, setActiveTab] = useState<'BOUTIQUES' | 'PROPOSITIONS' | 'AVIS' | 'BADGES' | 'UTILISATEURS' | 'JOURNAL'>('BOUTIQUES');
+  const [activeTab, setActiveTab] = useState<'BOUTIQUES' | 'PROPOSITIONS' | 'AVIS' | 'BADGES' | 'MARCHES' | 'UTILISATEURS' | 'JOURNAL'>('BOUTIQUES');
   const [isLoading, setIsLoading] = useState(true);
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -201,6 +203,20 @@ export default function AdminDashboardPage() {
           <ShieldCheck className="w-4 h-4" />
           <span>Badges Certifiés ({data.demandesBadges.length})</span>
         </button>
+
+        {currentUser?.role === 'ADMIN' && (
+          <button
+            onClick={() => setActiveTab('MARCHES')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold shrink-0 transition flex items-center gap-2 ${
+              activeTab === 'MARCHES'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                : 'bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700'
+            }`}
+          >
+            <Globe className="w-4 h-4" />
+            <span>Marchés</span>
+          </button>
+        )}
 
         {currentUser?.role === 'ADMIN' && (
           <button
@@ -494,6 +510,8 @@ export default function AdminDashboardPage() {
       )}
 
       {/* TAB 5: GESTION DES UTILISATEURS & RÔLES (ADMIN SEUL) */}
+      {activeTab === 'MARCHES' && currentUser?.role === 'ADMIN' && <GestionMarches />}
+
       {activeTab === 'UTILISATEURS' && currentUser?.role === 'ADMIN' && (
         <div className="space-y-3">
           <div className="glass-card rounded-2xl p-4 border border-slate-800 overflow-x-auto">

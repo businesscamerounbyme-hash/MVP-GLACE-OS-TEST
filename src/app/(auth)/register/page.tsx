@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { VILLES_AFRIQUE, PAYS_AFRIQUE, villesDuPays } from '@/lib/geo';
+import { VILLES_AFRIQUE, villesDuPays } from '@/lib/geo';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 
 export default function RegisterPage() {
@@ -21,14 +21,41 @@ export default function RegisterPage() {
   const [quartierBoutique, setQuartierBoutique] = useState('');
   const [whatsappBoutique, setWhatsappBoutique] = useState('');
 
+  const [paysDisponibles, setPaysDisponibles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetch("/api/pays")
+      .then((r) => r.json())
+      .then((d) => d.success && setPaysDisponibles(d.pays))
+      .catch(() => {});
+  }, []);
+
+  // Un membre peut resider partout en Afrique ; un fournisseur ne peut s installer
+  // que la ou l administrateur a ouvert le marche.
+  const paysAffiches =
+    role === "SUPPLIER" ? paysDisponibles.filter((p) => p.ouvertAuxBoutiques) : paysDisponibles;
+
+  // Bascule vers fournisseur alors que le pays choisi est ferme : on repositionne sur
+  // un marche ouvert plutot que de laisser un menu vide ou une valeur invalide.
+  useEffect(() => {
+    if (role !== "SUPPLIER" || !paysDisponibles.length) return;
+    const actuel = paysDisponibles.find((p) => p.nom === pays);
+    if (!actuel?.ouvertAuxBoutiques) {
+      const premier = paysDisponibles.find((p) => p.ouvertAuxBoutiques);
+      if (premier) handleCountryChange(premier.nom);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, paysDisponibles]);
+
   const handleCountryChange = (selectedCountry: string) => {
     setPays(selectedCountry);
     const firstCity = VILLES_AFRIQUE.find(v => v.pays === selectedCountry);
-    if (firstCity) setVille(firstCity.nom);
+    // Sans ville referencee, on repart d un champ vide plutot que de conserver la ville
+    // du pays precedent, qui produirait des couples incoherents comme Dakar/Kenya.
+    setVille(firstCity ? firstCity.nom : "");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,7 +236,7 @@ export default function RegisterPage() {
               onChange={(e) => handleCountryChange(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
             >
-              {PAYS_AFRIQUE.map((p) => (
+              {paysAffiches.map((p) => (
                 <option key={p.code} value={p.nom}>
                   {p.drapeau} {p.nom}
                 </option>
@@ -221,18 +248,31 @@ export default function RegisterPage() {
             <label className="block text-xs font-bold text-slate-300 mb-1.5">Ville</label>
             {/* Champ libre auparavant : une faute de frappe créait une ville fantôme,
                 invisible des filtres de recherche qui comparent le nom exact. */}
-            <select
-              required
-              value={ville}
-              onChange={(e) => setVille(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
-            >
-              {villesDuPays(pays).map((v) => (
-                <option key={v.nom} value={v.nom}>
-                  {v.nom}
-                </option>
-              ))}
-            </select>
+            {/* Les villes ne sont referencees que pour les marches deja couverts. Ailleurs
+                la saisie reste libre : imposer une liste vide bloquerait l inscription. */}
+            {villesDuPays(pays).length > 0 ? (
+              <select
+                required
+                value={ville}
+                onChange={(e) => setVille(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
+              >
+                {villesDuPays(pays).map((v) => (
+                  <option key={v.nom} value={v.nom}>
+                    {v.nom}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                required
+                placeholder="Votre ville"
+                value={ville}
+                onChange={(e) => setVille(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+              />
+            )}
           </div>
         </div>
 
