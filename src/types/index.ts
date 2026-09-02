@@ -17,6 +17,8 @@ export type TypePaiement = 'ABONNEMENT_FOURNISSEUR' | 'ABONNEMENT_MEMBRE' | 'DEM
 export interface UserSession {
   id: string;
   nom: string;
+  prenom?: string | null;
+  photoUrl?: string | null;
   email: string;
   telephone: string;
   pays: string;

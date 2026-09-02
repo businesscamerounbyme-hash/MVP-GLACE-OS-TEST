@@ -17,6 +17,7 @@ const ESPACES_PROTEGES: { prefixe: string; roles: string[] | null }[] = [
   { prefixe: '/fournisseur', roles: ['SUPPLIER', 'ADMIN'] },
   { prefixe: '/membre', roles: null },
   { prefixe: '/espace', roles: null },
+  { prefixe: '/profil', roles: null },
 ];
 
 export async function middleware(request: NextRequest) {
@@ -61,5 +62,11 @@ function redirigerVersConnexion(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/fournisseur/:path*', '/membre/:path*', '/espace/:path*'],
+  matcher: [
+    '/admin/:path*',
+    '/fournisseur/:path*',
+    '/membre/:path*',
+    '/espace/:path*',
+    '/profil/:path*',
+  ],
 };

@@ -3,15 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { nomComplet, initiales } from '@/lib/nom';
 import { 
   User, 
   Crown, 
   Store, 
   ShieldCheck, 
   LogOut, 
-  ArrowRight, 
+  ArrowRight,
   Loader2,
-  Sparkles
+  Sparkles,
+  Settings,
+  ChevronRight
 } from 'lucide-react';
 import { UserSession } from '@/types';
 
@@ -56,12 +59,21 @@ export default function EspaceHubPage() {
       
       {/* Profile Card */}
       <div className="glass-card rounded-3xl p-6 border border-slate-800 text-center space-y-3 relative overflow-hidden">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-emerald-600 flex items-center justify-center font-black text-xl text-white mx-auto shadow-xl">
-          {user.nom.slice(0, 2).toUpperCase()}
-        </div>
+        {user.photoUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={user.photoUrl}
+            alt="Photo de profil"
+            className="w-16 h-16 rounded-2xl object-cover mx-auto shadow-xl border border-slate-700"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-emerald-600 flex items-center justify-center font-black text-xl text-white mx-auto shadow-xl">
+            {initiales(user)}
+          </div>
+        )}
 
         <div>
-          <h1 className="text-xl font-black text-white">{user.nom}</h1>
+          <h1 className="text-xl font-black text-white">{nomComplet(user)}</h1>
           <p className="text-xs text-slate-400">{user.email} • {user.telephone}</p>
           <div className="mt-2 flex items-center justify-center gap-2">
             <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -78,6 +90,26 @@ export default function EspaceHubPage() {
 
       {/* Navigation shortcuts based on role */}
       <div className="space-y-3">
+        <Link
+          href="/profil"
+          className="glass-card glass-card-hover rounded-2xl p-4 border border-slate-700 flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 flex items-center justify-center">
+              <Settings className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-white group-hover:text-amber-300">
+                Modifier mon profil
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Nom, coordonnées, photo et mot de passe
+              </p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-300" />
+        </Link>
+
         {user.role === 'ADMIN' || user.role === 'MODERATOR' ? (
           <Link
             href="/admin"

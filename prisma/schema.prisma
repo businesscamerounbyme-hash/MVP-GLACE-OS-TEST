@@ -10,7 +10,12 @@ generator client {
 
 model Utilisateur {
   id           String      @id @default(cuid())
+  /// Nom de famille. Sur les comptes anterieurs a la separation prenom/nom, ce champ
+  /// contient encore le nom complet et prenom vaut null : nomComplet() gere les deux.
   nom          String
+  prenom       String?
+  /// URL de la photo de profil. Null tant que l utilisateur n en a pas televerse.
+  photoUrl     String?
   email        String      @unique
   telephone    String
   motDePasse   String

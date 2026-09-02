@@ -78,6 +78,8 @@ export async function getCurrentUser(): Promise<UserSession | null> {
     return {
       id: user.id,
       nom: user.nom,
+      prenom: user.prenom,
+      photoUrl: user.photoUrl,
       email: user.email,
       telephone: user.telephone,
       pays: user.pays,

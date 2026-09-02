@@ -10,6 +10,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { 
       nom, 
+      prenom,
       email, 
       telephone, 
       motDePasse, 
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
     const user = await prisma.utilisateur.create({
       data: {
         nom: nom.trim(),
+        prenom: typeof prenom === "string" && prenom.trim() ? prenom.trim() : null,
         email: email.toLowerCase().trim(),
         telephone: telephone.trim(),
         motDePasse: hashedPassword,
