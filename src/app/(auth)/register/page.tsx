@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [role, setRole] = useState<'MEMBER' | 'SUPPLIER'>('MEMBER');
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
@@ -67,12 +65,12 @@ export default function RegisterPage() {
       setIsLoading(false);
 
       setTimeout(() => {
-        if (role === 'SUPPLIER') {
-          router.push('/fournisseur');
-        } else {
-          router.push('/');
-        }
-        router.refresh();
+        // Navigation complète et non `router.push` : la barre de navigation est un
+        // composant client du layout, qui ne lit la session qu'à son montage. Une
+        // navigation interne ne la remonte pas, et `router.refresh()` ne rejoue que
+        // les composants serveur — l'utilisateur restait donc affiché comme déconnecté
+        // jusqu'à ce qu'il recharge la page à la main.
+        window.location.assign(role === 'SUPPLIER' ? '/fournisseur' : '/');
       }, 1500);
 
     } catch (err: any) {

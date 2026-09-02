@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Sparkles, Lock, Mail, ArrowRight, Loader2, ShieldCheck, Store, User, Zap } from 'lucide-react';
 
 export default function LoginPage() {
@@ -14,7 +14,6 @@ export default function LoginPage() {
 }
 
 function FormulaireConnexion() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
@@ -47,8 +46,12 @@ function FormulaireConnexion() {
       // de rediriger la victime vers un site tiers apres une connexion reussie.
       const suite = searchParams.get('suite');
       const destination = suite && suite.startsWith('/') && !suite.startsWith('//') ? suite : '/';
-      router.push(destination);
-      router.refresh();
+      // Navigation complète et non `router.push` : la barre de navigation est un
+      // composant client du layout, qui ne lit la session qu'à son montage. Une
+      // navigation interne ne la remonte pas, et `router.refresh()` ne rejoue que les
+      // composants serveur — l'utilisateur restait donc affiché comme déconnecté,
+      // avec les boutons Connexion et S'inscrire, jusqu'à un rechargement manuel.
+      window.location.assign(destination);
     } catch (err: any) {
       setError('Erreur de connexion au serveur.');
       setIsLoading(false);
