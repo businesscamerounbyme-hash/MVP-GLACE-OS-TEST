@@ -262,6 +262,7 @@ export default function ProfilPage() {
               value={infos.prenom}
               onChange={(v) => setInfos({ ...infos, prenom: v })}
               placeholder="Fatou"
+              requis
             />
             <Champ
               label="Nom"

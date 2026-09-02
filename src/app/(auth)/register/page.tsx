@@ -185,11 +185,14 @@ export default function RegisterPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            {/* Le prénom reste facultatif : un fournisseur s'inscrit souvent sous une
-                raison sociale, qui n'en a pas. */}
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">Prénom</label>
+            {/* Identité de la personne qui s'inscrit. Le nom de l entreprise se saisit
+                plus bas, dans la partie fournisseur : ce sont deux choses distinctes. */}
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              Prénom <span className="text-amber-400">*</span>
+            </label>
             <input
               type="text"
+              required
               placeholder="Ex: Aïcha"
               value={prenom}
               onChange={(e) => setPrenom(e.target.value)}
@@ -199,7 +202,7 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1.5">
-              Nom ou Entreprise <span className="text-amber-400">*</span>
+              Nom <span className="text-amber-400">*</span>
             </label>
             <input
               type="text"

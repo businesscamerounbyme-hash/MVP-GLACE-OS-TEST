@@ -28,9 +28,20 @@ export async function POST(request: Request) {
       longitude
     } = body;
 
-    if (!nom || !email || !telephone || !motDePasse || !pays || !ville) {
+    if (!nom || !prenom || !email || !telephone || !motDePasse || !pays || !ville) {
       return NextResponse.json(
         { success: false, message: 'Veuillez remplir tous les champs obligatoires.' },
+        { status: 400 }
+      );
+    }
+
+    // Le nom de la boutique est une identité commerciale distincte de celle de son
+    // propriétaire. Le déduire du nom de la personne, comme le faisait un repli
+    // « Boutique de X », produisait des enseignes que le fournisseur n'a pas choisies
+    // et sous lesquelles ses clients ne le reconnaîtraient pas.
+    if (role === 'SUPPLIER' && (!nomBoutique || !String(nomBoutique).trim())) {
+      return NextResponse.json(
+        { success: false, message: 'Le nom commercial de la boutique est obligatoire.' },
         { status: 400 }
       );
     }
@@ -118,7 +129,7 @@ export async function POST(request: Request) {
       boutique = await prisma.boutique.create({
         data: {
           utilisateurId: user.id,
-          nom: nomBoutique ? nomBoutique.trim() : `Boutique de ${nom}`,
+          nom: nomBoutique.trim(),
           description: descriptionBoutique ? descriptionBoutique.trim() : 'Fournisseur d’ingrédients et équipements pour glaciers.',
           pays,
           ville,
