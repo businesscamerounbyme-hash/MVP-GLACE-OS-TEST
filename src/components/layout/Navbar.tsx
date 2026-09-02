@@ -16,10 +16,12 @@ import {
   Clock, 
   ChevronDown,
   Menu,
+  Settings,
   X
 } from 'lucide-react';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 import { UserSession } from '@/types';
+import { nomComplet, initiales } from '@/lib/nom';
 
 export default function Navbar() {
   const router = useRouter();
@@ -142,12 +144,21 @@ export default function Navbar() {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-emerald-600 flex items-center justify-center font-bold text-xs text-white uppercase">
-                    {user.nom.slice(0, 2)}
-                  </div>
+                  {user.photoUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={user.photoUrl}
+                      alt=""
+                      className="w-8 h-8 rounded-lg object-cover border border-slate-700"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-emerald-600 flex items-center justify-center font-bold text-xs text-white uppercase">
+                      {initiales(user)}
+                    </div>
+                  )}
                   <div className="hidden lg:flex flex-col text-left">
                     <span className="text-xs font-semibold text-slate-200 truncate max-w-[120px]">
-                      {user.nom}
+                      {nomComplet(user)}
                     </span>
                     <span className="text-[10px] text-amber-400 font-medium">
                       {user.role === 'ADMIN' ? '👑 Admin' : user.role === 'MODERATOR' ? '🛡️ Modérateur' : user.role === 'SUPPLIER' ? '🏪 Fournisseur' : user.hasActiveMembership ? '⭐ Membre PRO' : 'Glacier Gratuit'}
@@ -160,7 +171,7 @@ export default function Navbar() {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900/95 border border-slate-800 shadow-2xl p-2 z-50 divide-y divide-slate-800">
                     <div className="px-3 py-2">
-                      <p className="text-xs font-bold text-white">{user.nom}</p>
+                      <p className="text-xs font-bold text-white">{nomComplet(user)}</p>
                       <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
                       <div className="mt-2 flex items-center gap-1.5">
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -175,6 +186,24 @@ export default function Navbar() {
                     </div>
 
                     <div className="py-1">
+                      <Link
+                        href="/profil"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-200 hover:bg-slate-800 rounded-xl transition"
+                      >
+                        <Settings className="w-4 h-4 text-slate-400" />
+                        Mon profil
+                      </Link>
+
+                      <Link
+                        href="/espace"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 rounded-xl transition"
+                      >
+                        <User className="w-4 h-4 text-slate-400" />
+                        Mon espace
+                      </Link>
+
                       {user.role === 'ADMIN' || user.role === 'MODERATOR' ? (
                         <Link
                           href="/admin"
