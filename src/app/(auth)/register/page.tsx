@@ -12,6 +12,7 @@ export default function RegisterPage() {
   useRedirectionSiConnecte();
   const [role, setRole] = useState<'MEMBER' | 'SUPPLIER'>('MEMBER');
   const [nom, setNom] = useState('');
+  const [prenom, setPrenom] = useState('');
   const [email, setEmail] = useState('');
   const [telephone, setTelephone] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
@@ -72,6 +73,7 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nom,
+          prenom,
           email,
           telephone,
           motDePasse,
@@ -183,11 +185,26 @@ export default function RegisterPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">Nom complet ou Entreprise</label>
+            {/* Le prénom reste facultatif : un fournisseur s'inscrit souvent sous une
+                raison sociale, qui n'en a pas. */}
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">Prénom</label>
+            <input
+              type="text"
+              placeholder="Ex: Aïcha"
+              value={prenom}
+              onChange={(e) => setPrenom(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              Nom ou Entreprise <span className="text-amber-400">*</span>
+            </label>
             <input
               type="text"
               required
-              placeholder="Ex: Aïcha Diallo"
+              placeholder="Ex: Diallo"
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
