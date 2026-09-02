@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { suggestionsVilles } from '@/lib/villes';
+import { useSuggestionsVilles } from '@/lib/villes-client';
 import { useRedirectionSiConnecte } from '@/lib/session-client';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 
@@ -24,6 +25,7 @@ export default function RegisterPage() {
   const [whatsappBoutique, setWhatsappBoutique] = useState('');
 
   const [paysDisponibles, setPaysDisponibles] = useState<any[]>([]);
+  const villesSuggerees = useSuggestionsVilles(pays);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -262,7 +264,7 @@ export default function RegisterPage() {
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
             />
             <datalist id="villes-connues">
-              {suggestionsVilles(pays).map((v) => (
+              {villesSuggerees.map((v) => (
                 <option key={v} value={v} />
               ))}
             </datalist>

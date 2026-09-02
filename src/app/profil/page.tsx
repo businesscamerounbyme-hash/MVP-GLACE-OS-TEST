@@ -13,7 +13,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
-import { suggestionsVilles } from '@/lib/villes';
+import { useSuggestionsVilles } from '@/lib/villes-client';
 import { PAYS_TRIES, drapeau } from '@/lib/pays';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 import { initiales } from '@/lib/nom';
@@ -32,6 +32,7 @@ export default function ProfilPage() {
     pays: '',
     ville: '',
   });
+  const villesSuggerees = useSuggestionsVilles(infos.pays);
   const [enregistrement, setEnregistrement] = useState(false);
   const [msgInfos, setMsgInfos] = useState<Message>(null);
 
@@ -319,7 +320,7 @@ export default function ProfilPage() {
                 className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
               />
               <datalist id="villes-profil">
-                {suggestionsVilles(infos.pays).map((v) => (
+                {villesSuggerees.map((v) => (
                   <option key={v} value={v} />
                 ))}
               </datalist>
