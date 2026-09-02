@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { VILLES_AFRIQUE, villesDuPays } from '@/lib/geo';
+import { useRedirectionSiConnecte } from '@/lib/session-client';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 
 export default function RegisterPage() {
+  useRedirectionSiConnecte();
   const [role, setRole] = useState<'MEMBER' | 'SUPPLIER'>('MEMBER');
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');

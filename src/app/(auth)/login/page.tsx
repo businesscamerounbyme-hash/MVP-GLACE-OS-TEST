@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useRedirectionSiConnecte } from '@/lib/session-client';
 import { Sparkles, Lock, Mail, ArrowRight, Loader2, ShieldCheck, Store, User, Zap } from 'lucide-react';
 
 export default function LoginPage() {
@@ -23,6 +24,7 @@ const EN_DEV = process.env.NODE_ENV === "development";
 
 function FormulaireConnexion() {
   const searchParams = useSearchParams();
+  useRedirectionSiConnecte();
   const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [isLoading, setIsLoading] = useState(false);

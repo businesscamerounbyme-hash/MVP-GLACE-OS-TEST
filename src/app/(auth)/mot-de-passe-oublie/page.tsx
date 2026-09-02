@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { useRedirectionSiConnecte } from '@/lib/session-client';
 
 export default function MotDePasseOubliePage() {
+  useRedirectionSiConnecte('/profil');
   const [email, setEmail] = useState('');
   const [enCours, setEnCours] = useState(false);
   const [envoye, setEnvoye] = useState(false);
