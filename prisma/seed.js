@@ -23,9 +23,15 @@ async function main() {
     throw new Error('SEED_ADMIN_PASSWORD est requis pour créer le compte administrateur.');
   }
   const hashedAdminPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10);
-  const hashedModoPassword = await bcrypt.hash('modo123', 10);
-  const hashedSupplierPassword = await bcrypt.hash('fournisseur123', 10);
-  const hashedMemberPassword = await bcrypt.hash('membre123', 10);
+  // Meme raison que pour l admin : ces comptes existent sur un site public, et des
+  // mots de passe ecrits ici seraient lisibles par quiconque ouvre le depot.
+  if (!process.env.SEED_DEMO_PASSWORD) {
+    throw new Error('SEED_DEMO_PASSWORD est requis pour creer les comptes de demonstration.');
+  }
+  const hashedDemo = await bcrypt.hash(process.env.SEED_DEMO_PASSWORD, 10);
+  const hashedModoPassword = hashedDemo;
+  const hashedSupplierPassword = hashedDemo;
+  const hashedMemberPassword = hashedDemo;
 
   // 1. Super Admin
   const admin = await prisma.utilisateur.create({

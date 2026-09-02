@@ -110,7 +110,7 @@ function FormulaireConnexion() {
 
           <button
             type="button"
-            onClick={() => quickLogin('moderateur@glace-os.com', 'modo123')}
+            onClick={() => quickLogin('moderateur@glace-os.com', process.env.NEXT_PUBLIC_DEMO_PASSWORD || '')}
             className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400 text-left transition"
           >
             <span className="font-bold text-emerald-300 block">🛡️ Modérateur</span>
@@ -119,7 +119,7 @@ function FormulaireConnexion() {
 
           <button
             type="button"
-            onClick={() => quickLogin('fournisseur.abidjan@cremodan-africa.com', 'fournisseur123')}
+            onClick={() => quickLogin('fournisseur.abidjan@cremodan-africa.com', process.env.NEXT_PUBLIC_DEMO_PASSWORD || '')}
             className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400 text-left transition"
           >
             <span className="font-bold text-sky-300 block">🏪 Fournisseur</span>
@@ -128,7 +128,7 @@ function FormulaireConnexion() {
 
           <button
             type="button"
-            onClick={() => quickLogin('membre.actif@glacier-dakar.com', 'membre123')}
+            onClick={() => quickLogin('membre.actif@glacier-dakar.com', process.env.NEXT_PUBLIC_DEMO_PASSWORD || '')}
             className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400 text-left transition"
           >
             <span className="font-bold text-amber-400 block">⭐ Membre Abonné</span>
