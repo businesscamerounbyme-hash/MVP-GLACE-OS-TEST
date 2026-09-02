@@ -13,6 +13,14 @@ export default function LoginPage() {
   );
 }
 
+/**
+ * Les comptes de demonstration ne doivent jamais apparaitre sur le site public :
+ * ils donnent un acces moderateur en un clic, sans aucune competence technique.
+ * NODE_ENV est statique au build, donc ce bloc est entierement supprime du bundle
+ * de production plutot que simplement masque a l affichage.
+ */
+const EN_DEV = process.env.NODE_ENV === "development";
+
 function FormulaireConnexion() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -77,7 +85,8 @@ function FormulaireConnexion() {
         </p>
       </div>
 
-      {/* Quick Demo Logins Box */}
+      {/* Comptes de demonstration — developpement uniquement */}
+      {EN_DEV && (
       <div className="glass-card rounded-2xl p-4 border border-amber-500/20 space-y-2.5">
         <span className="text-[10px] uppercase font-extrabold tracking-wider text-amber-400 block">
           ⚡ Comptes de Démonstration (1 Clic)
@@ -85,7 +94,14 @@ function FormulaireConnexion() {
         <div className="grid grid-cols-2 gap-2 text-xs">
           <button
             type="button"
-            onClick={() => quickLogin('admin@glace-os.com', 'admin123')}
+            onClick={() =>
+              quickLogin(
+                'admin@glace-os.com',
+                // Lu depuis l environnement local : ecrire le vrai mot de passe ici le
+                // publierait dans le depot, ce qui annulerait le durcissement du seed.
+                process.env.NEXT_PUBLIC_DEMO_ADMIN_PASSWORD || ''
+              )
+            }
             className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400 text-left transition"
           >
             <span className="font-bold text-amber-300 block">👑 Super Admin</span>
@@ -120,6 +136,7 @@ function FormulaireConnexion() {
           </button>
         </div>
       </div>
+      )}
 
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="glass-card rounded-3xl p-6 border border-slate-800 space-y-4">
