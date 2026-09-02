@@ -67,22 +67,23 @@ export default function FournisseurDashboard() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const resUser = await fetch('/api/auth/me');
-      const dataUser = await resUser.json();
+      // Session, catalogue et boutiques ne dépendent pas les uns des autres : les
+      // enchaîner en série faisait attendre la somme des trois latences. Seul le
+      // détail de la boutique, plus bas, a besoin d'un résultat précédent.
+      const [dataUser, dataCat, dataBoutiques] = await Promise.all([
+        fetch('/api/auth/me').then((r) => r.json()),
+        fetch('/api/produits-reference').then((r) => r.json()),
+        fetch('/api/boutiques').then((r) => r.json()),
+      ]);
+
       if (!dataUser.user) {
         router.push('/login');
         return;
       }
       setUser(dataUser.user);
 
-      // Charger le catalogue de référence
-      const resCat = await fetch('/api/produits-reference');
-      const dataCat = await resCat.json();
       if (dataCat.success) setCatalogueRef(dataCat.produits || []);
 
-      // Charger la boutique du fournisseur
-      const resBoutiques = await fetch('/api/boutiques');
-      const dataBoutiques = await resBoutiques.json();
       if (dataBoutiques.success) {
         const found = dataBoutiques.boutiques.find((b: any) => b.utilisateurId === dataUser.user.id);
         if (found) {

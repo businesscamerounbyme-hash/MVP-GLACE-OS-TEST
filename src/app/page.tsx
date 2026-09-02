@@ -63,19 +63,17 @@ export default function HomePage() {
       const catQuery = selectedCategory !== 'TOUTES' ? `&categorie=${selectedCategory}` : '';
       const qQuery = searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : '';
 
-      // Charger les produits de référence
-      const resProd = await fetch(`/api/produits-reference?${catQuery}${qQuery}`);
-      const dataProd = await resProd.json();
+      // Les trois appels sont indépendants : les enchaîner en série faisait payer la
+      // somme des latences au lieu de la plus longue, soit environ trois fois le temps
+      // d'attente sur une connexion lente.
+      const [dataProd, dataBoutiques, dataOffres] = await Promise.all([
+        fetch(`/api/produits-reference?${catQuery}${qQuery}`).then((r) => r.json()),
+        fetch(`/api/boutiques?${cityQuery}${catQuery}${qQuery}${geoQuery}`).then((r) => r.json()),
+        fetch(`/api/offres?${cityQuery}${catQuery}${geoQuery}`).then((r) => r.json()),
+      ]);
+
       if (dataProd.success) setProduits(dataProd.produits || []);
-
-      // Charger les boutiques
-      const resBoutiques = await fetch(`/api/boutiques?${cityQuery}${catQuery}${qQuery}${geoQuery}`);
-      const dataBoutiques = await resBoutiques.json();
       if (dataBoutiques.success) setBoutiques(dataBoutiques.boutiques || []);
-
-      // Charger les offres pour le comparateur
-      const resOffres = await fetch(`/api/offres?${cityQuery}${catQuery}${geoQuery}`);
-      const dataOffres = await resOffres.json();
       if (dataOffres.success) setOffres(dataOffres.offres || []);
 
     } catch (err) {
