@@ -13,7 +13,8 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
-import { PAYS_AFRIQUE, villesDuPays } from '@/lib/geo';
+import { villesDuPays } from '@/lib/geo';
+import { PAYS_TRIES, drapeau } from '@/lib/pays';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 import { initiales } from '@/lib/nom';
 
@@ -288,15 +289,15 @@ export default function ProfilPage() {
                 onChange={(e) => {
                   // Changer de pays reinitialise la ville sur la premiere du pays :
                   // conserver l ancienne donnerait des couples incoherents (Dakar/Mali).
-                  const nouveauPays = e.target.value;
-                  const premiere = villesDuPays(nouveauPays)[0];
-                  setInfos({ ...infos, pays: nouveauPays, ville: premiere ? premiere.nom : '' });
+                  // La ville est vidée : conserver celle du pays precedent produirait
+                  // des couples incoherents comme Dakar/Kenya.
+                  setInfos({ ...infos, pays: e.target.value, ville: '' });
                 }}
                 className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
               >
-                {PAYS_AFRIQUE.map((p) => (
+                {PAYS_TRIES.map((p) => (
                   <option key={p.code} value={p.nom}>
-                    {p.drapeau} {p.nom}
+                    {drapeau(p.code)} {p.nom}
                   </option>
                 ))}
               </select>
@@ -306,17 +307,22 @@ export default function ProfilPage() {
               <label className="block text-[11px] font-semibold text-slate-300 mb-1.5">
                 Ville <span className="text-amber-400">*</span>
               </label>
-              <select
+              {/* Saisie libre, comme a l inscription : les villes connues ne couvrent
+                  qu une poignee de pays et servent ici de simples suggestions. */}
+              <input
+                type="text"
+                required
+                list="villes-profil"
+                placeholder="Votre ville"
                 value={infos.ville}
                 onChange={(e) => setInfos({ ...infos, ville: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
-              >
+                className="w-full px-3 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+              />
+              <datalist id="villes-profil">
                 {villesDuPays(infos.pays).map((v) => (
-                  <option key={v.nom} value={v.nom}>
-                    {v.nom}
-                  </option>
+                  <option key={v.nom} value={v.nom} />
                 ))}
-              </select>
+              </datalist>
             </div>
           </div>
 

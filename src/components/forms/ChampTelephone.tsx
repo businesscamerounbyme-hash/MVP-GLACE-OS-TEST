@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Phone } from 'lucide-react';
-import { PAYS_AFRIQUE, PaysAfrique } from '@/lib/geo';
+import { PAYS_TRIES, Pays, drapeau } from '@/lib/pays';
 
 interface Props {
   /** Numéro complet, indicatif compris — c'est ce qui est stocké. */
@@ -32,12 +32,13 @@ export default function ChampTelephone({
   requis = false,
 }: Props) {
   const paysInitial =
-    PAYS_AFRIQUE.find((p) => valeur && valeur.startsWith(p.indicatif)) ??
-    PAYS_AFRIQUE.find((p) => p.nom === paysParDefaut) ??
-    PAYS_AFRIQUE[0];
+    PAYS_TRIES.find((p) => valeur && valeur.startsWith(p.indicatif)) ??
+    PAYS_TRIES.find((p) => p.nom === paysParDefaut) ??
+    PAYS_TRIES[0];
 
-  const [pays, setPays] = useState<PaysAfrique>(paysInitial);
+  const [pays, setPays] = useState<Pays>(paysInitial);
   const [ouvert, setOuvert] = useState(false);
+  const [recherche, setRecherche] = useState('');
   const conteneur = useRef<HTMLDivElement>(null);
 
   const numeroLocal = valeur.startsWith(pays.indicatif)
@@ -48,7 +49,7 @@ export default function ChampTelephone({
   // changer de pays doit mettre à jour l'indicatif, sans écraser une saisie en cours.
   useEffect(() => {
     if (numeroLocal) return;
-    const correspondant = PAYS_AFRIQUE.find((p) => p.nom === paysParDefaut);
+    const correspondant = PAYS_TRIES.find((p) => p.nom === paysParDefaut);
     if (correspondant && correspondant.code !== pays.code) {
       setPays(correspondant);
       onChange('');
@@ -75,9 +76,19 @@ export default function ChampTelephone({
     return chiffres ? `${indicatif} ${chiffres}` : '';
   };
 
-  const changerPays = (p: PaysAfrique) => {
+  // 54 pays sans filtre obligeraient a faire defiler pour trouver le sien.
+  const filtres = recherche.trim()
+    ? PAYS_TRIES.filter(
+        (p) =>
+          p.nom.toLowerCase().includes(recherche.trim().toLowerCase()) ||
+          p.indicatif.includes(recherche.trim())
+      )
+    : PAYS_TRIES;
+
+  const changerPays = (p: Pays) => {
     setPays(p);
     setOuvert(false);
+    setRecherche('');
     onChange(composer(p.indicatif, numeroLocal));
   };
 
@@ -95,14 +106,26 @@ export default function ChampTelephone({
             className="h-full flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white hover:border-amber-400/60 transition"
             aria-label="Choisir l’indicatif du pays"
           >
-            <span className="text-base leading-none">{pays.drapeau}</span>
+            <span className="text-base leading-none">{drapeau(pays.code)}</span>
             <span className="font-semibold">{pays.indicatif}</span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
           </button>
 
           {ouvert && (
-            <div className="absolute left-0 top-full mt-1 w-56 max-h-64 overflow-y-auto rounded-xl bg-slate-900 border border-slate-800 shadow-2xl py-1.5 z-50">
-              {PAYS_AFRIQUE.map((p) => (
+            <div className="absolute left-0 top-full mt-1 w-60 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl z-50 overflow-hidden">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Rechercher un pays..."
+                value={recherche}
+                onChange={(e) => setRecherche(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-950 border-b border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none"
+              />
+              <div className="max-h-56 overflow-y-auto py-1">
+              {filtres.length === 0 && (
+                <p className="px-3 py-2 text-[11px] text-slate-500">Aucun pays trouvé.</p>
+              )}
+              {filtres.map((p) => (
                 <button
                   key={p.code}
                   type="button"
@@ -113,11 +136,12 @@ export default function ChampTelephone({
                       : 'text-slate-300 hover:bg-slate-800'
                   }`}
                 >
-                  <span className="text-base leading-none">{p.drapeau}</span>
+                  <span className="text-base leading-none">{drapeau(p.code)}</span>
                   <span className="flex-1 truncate">{p.nom}</span>
                   <span className="text-slate-500 font-mono">{p.indicatif}</span>
                 </button>
               ))}
+              </div>
             </div>
           )}
         </div>

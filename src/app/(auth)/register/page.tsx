@@ -250,31 +250,23 @@ export default function RegisterPage() {
             <label className="block text-xs font-bold text-slate-300 mb-1.5">Ville</label>
             {/* Champ libre auparavant : une faute de frappe créait une ville fantôme,
                 invisible des filtres de recherche qui comparent le nom exact. */}
-            {/* Les villes ne sont referencees que pour les marches deja couverts. Ailleurs
-                la saisie reste libre : imposer une liste vide bloquerait l inscription. */}
-            {villesDuPays(pays).length > 0 ? (
-              <select
-                required
-                value={ville}
-                onChange={(e) => setVille(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
-              >
-                {villesDuPays(pays).map((v) => (
-                  <option key={v.nom} value={v.nom}>
-                    {v.nom}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                required
-                placeholder="Votre ville"
-                value={ville}
-                onChange={(e) => setVille(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-              />
-            )}
+            {/* Saisie libre : imposer une liste alors qu une seule ville par pays est
+                referencee bloquerait la majorite des inscrits. Les villes connues sont
+                proposees en suggestions, sans jamais restreindre la saisie. */}
+            <input
+              type="text"
+              required
+              list="villes-connues"
+              placeholder="Votre ville"
+              value={ville}
+              onChange={(e) => setVille(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+            />
+            <datalist id="villes-connues">
+              {villesDuPays(pays).map((v) => (
+                <option key={v.nom} value={v.nom} />
+              ))}
+            </datalist>
           </div>
         </div>
 
