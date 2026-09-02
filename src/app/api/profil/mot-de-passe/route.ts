@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser, comparePassword, hashPassword } from '@/lib/auth';
+import { getCurrentUser, comparePassword, hashPassword, generateToken } from '@/lib/auth';
+import { cookies } from 'next/headers';
 import { requireUser, authErrorResponse } from '@/lib/guard';
 import { verifierMotDePasse } from '@/lib/validation';
 import { ipDepuisRequete, verifierLimite, enregistrerTentative } from '@/lib/rate-limit';
@@ -68,10 +69,29 @@ export async function POST(request: Request) {
 
     await prisma.utilisateur.update({
       where: { id: user.id },
-      data: { motDePasse: await hashPassword(nouveauMotDePasse) },
+      data: {
+        motDePasse: await hashPassword(nouveauMotDePasse),
+        motDePasseModifieLe: new Date(),
+      },
     });
 
     await enregistrerTentative(session.email, ip, true);
+
+    // Le jeton courant a ete emis avant motDePasseModifieLe : il vient donc d etre
+    // invalide. On en reemet un pour que l auteur du changement reste connecte, alors
+    // que les autres sessions ouvertes, elles, tombent bien.
+    const cookieStore = await cookies();
+    cookieStore.set(
+      'glace_session_token',
+      generateToken({ userId: session.id, email: session.email, role: session.role }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60,
+      }
+    );
 
     return NextResponse.json({
       success: true,

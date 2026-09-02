@@ -194,6 +194,15 @@ function FormulaireConnexion() {
           )}
         </button>
 
+        <div className="text-center">
+          <Link
+            href="/mot-de-passe-oublie"
+            className="text-[11px] font-semibold text-slate-400 hover:text-amber-400"
+          >
+            Mot de passe oublié ?
+          </Link>
+        </div>
+
         <div className="text-center pt-2">
           <p className="text-xs text-slate-400">
             Pas encore de compte ?{' '}

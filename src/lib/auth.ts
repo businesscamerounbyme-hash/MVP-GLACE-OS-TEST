@@ -73,6 +73,13 @@ export async function getCurrentUser(): Promise<UserSession | null> {
 
     if (!user) return null;
 
+    // Un mot de passe change apres l emission du jeton invalide la session : sinon
+    // une reinitialisation laisserait un intrus connecte pendant 30 jours.
+    if (user.motDePasseModifieLe) {
+      const emisLe = typeof decoded.iat === "number" ? decoded.iat * 1000 : 0;
+      if (emisLe < user.motDePasseModifieLe.getTime()) return null;
+    }
+
     const hasActiveMembership = user.role === 'ADMIN' || user.role === 'MODERATOR' || (user.abonnementsMembre && user.abonnementsMembre.length > 0);
 
     return {

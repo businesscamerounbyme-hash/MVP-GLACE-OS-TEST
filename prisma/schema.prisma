@@ -22,6 +22,10 @@ model Utilisateur {
   pays         String
   ville        String
   role         String      @default("MEMBER") // ADMIN, MODERATOR, SUPPLIER, MEMBER
+  /// Date du dernier changement de mot de passe. Les jetons de session emis avant
+  /// cette date sont refuses : reinitialiser doit deconnecter un intrus deja en place,
+  /// sinon la reinitialisation ne sert a rien dans le cas ou elle est le plus utile.
+  motDePasseModifieLe DateTime?
   dateCreation DateTime    @default(now())
 
   boutiques            Boutique[]
@@ -29,6 +33,7 @@ model Utilisateur {
   abonnementsMembre    AbonnementMembre[]
   actionsModeration    JournalModeration[]
   paiements            Paiement[]
+  reinitialisations    ReinitialisationMotDePasse[]
 }
 
 model Boutique {
@@ -209,4 +214,21 @@ model TentativeConnexion {
   dateEssai  DateTime @default(now())
 
   @@index([cle, dateEssai])
+}
+
+/// Demande de reinitialisation de mot de passe.
+/// Le jeton n est jamais stocke en clair : seule son empreinte SHA-256 est conservee,
+/// de sorte qu une fuite de la base ne permette pas de prendre la main sur les comptes.
+model ReinitialisationMotDePasse {
+  id            String    @id @default(cuid())
+  utilisateurId String
+  tokenHash     String    @unique
+  expiration    DateTime
+  utiliseLe     DateTime?
+  dateCreation  DateTime  @default(now())
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+
+  @@index([utilisateurId])
+  @@index([expiration])
 }
