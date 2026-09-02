@@ -45,7 +45,9 @@ export default function ProfilPage() {
     fetch('/api/auth/me')
       .then((r) => r.json())
       .then((d) => {
-        if (!d.success || !d.user) {
+        // /api/auth/me renvoie { user } sans enveloppe `success` : tester un champ
+        // absent renvoyait systématiquement vers la connexion, y compris authentifié.
+        if (!d.user) {
           router.push('/login?suite=/profil');
           return;
         }
