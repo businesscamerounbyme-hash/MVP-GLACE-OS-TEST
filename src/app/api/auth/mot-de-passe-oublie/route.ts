@@ -65,7 +65,21 @@ export async function POST(request: Request) {
     const lien = `${base}/reinitialiser?jeton=${jeton}`;
 
     const courriel = courrielReinitialisation(lien, nomComplet(utilisateur));
-    await envoyerCourriel({ ...courriel, destinataire: utilisateur.email });
+
+    // Un echec d envoi ne doit pas rester muet : la reponse est neutre par conception,
+    // donc sans cette trace une panne du service d email serait invisible, et le lien
+    // genere serait perdu. Hors production, le lien est journalise pour rester utilisable.
+    try {
+      await envoyerCourriel({ ...courriel, destinataire: utilisateur.email });
+    } catch (err) {
+      console.error(
+        `Envoi du lien de reinitialisation impossible pour l utilisateur ${utilisateur.id}:`,
+        err
+      );
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`Lien de reinitialisation (developpement) : ${lien}`);
+      }
+    }
 
     return reponseNeutre;
   } catch (error) {
