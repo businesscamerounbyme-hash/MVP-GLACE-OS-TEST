@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
-import { VILLES_AFRIQUE, villesDuPays } from '@/lib/geo';
+import { suggestionsVilles } from '@/lib/villes';
 import { useRedirectionSiConnecte } from '@/lib/session-client';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 
@@ -54,10 +54,9 @@ export default function RegisterPage() {
 
   const handleCountryChange = (selectedCountry: string) => {
     setPays(selectedCountry);
-    const firstCity = VILLES_AFRIQUE.find(v => v.pays === selectedCountry);
-    // Sans ville referencee, on repart d un champ vide plutot que de conserver la ville
-    // du pays precedent, qui produirait des couples incoherents comme Dakar/Kenya.
-    setVille(firstCity ? firstCity.nom : "");
+    // Pre-remplissage sur la plus grande ville du pays, modifiable librement. Garder la
+    // ville precedente produirait des couples incoherents comme Dakar/Kenya.
+    setVille(suggestionsVilles(selectedCountry)[0] ?? "");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -263,8 +262,8 @@ export default function RegisterPage() {
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
             />
             <datalist id="villes-connues">
-              {villesDuPays(pays).map((v) => (
-                <option key={v.nom} value={v.nom} />
+              {suggestionsVilles(pays).map((v) => (
+                <option key={v} value={v} />
               ))}
             </datalist>
           </div>
