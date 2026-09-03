@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { MapPin, Navigation } from 'lucide-react';
 
 interface Props {
@@ -9,6 +10,14 @@ interface Props {
   /** `pastille` pour un bloc autonome, `ligne` pour une mention dans un flux de texte. */
   variante?: 'pastille' | 'ligne';
   taille?: 'normal' | 'compact';
+  /**
+   * Rend l adresse cliquable : elle mene aux boutiques de cette ville.
+   *
+   * A laisser a false lorsque l adresse est deja contenue dans un lien — imbriquer
+   * deux ancres produit un balisage invalide, que les navigateurs resolvent chacun
+   * a leur maniere.
+   */
+  cliquable?: boolean;
 }
 
 /**
@@ -28,6 +37,7 @@ export default function Adresse({
   distanceKm,
   variante = 'pastille',
   taille = 'normal',
+  cliquable = false,
 }: Props) {
   const compact = taille === 'compact';
 
@@ -46,8 +56,23 @@ export default function Adresse({
       </span>
     ) : null;
 
+  // Enveloppe commune aux deux variantes : la destination est toujours la liste des
+  // boutiques filtree sur cette ville.
+  const enrobe = (contenu: React.ReactElement) =>
+    cliquable ? (
+      <Link
+        href={`/boutiques?ville=${encodeURIComponent(ville)}`}
+        title={`Voir les boutiques à ${ville}`}
+        className="inline-flex hover:brightness-125 hover:scale-[1.03] active:scale-95 transition"
+      >
+        {contenu}
+      </Link>
+    ) : (
+      contenu
+    );
+
   if (variante === 'ligne') {
-    return (
+    return enrobe(
       <span
         className={`inline-flex items-center gap-1.5 font-semibold text-sky-300 ${
           compact ? 'text-[11px]' : 'text-xs'
@@ -61,11 +86,11 @@ export default function Adresse({
     );
   }
 
-  return (
+  return enrobe(
     <span
       className={`inline-flex items-center rounded-full bg-sky-500/15 border border-sky-400/40 text-sky-200 font-bold shadow-sm shadow-sky-500/10 ${
-        compact ? 'gap-1 px-2 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'
-      }`}
+        cliquable ? 'cursor-pointer hover:bg-sky-500/25 hover:border-sky-300/70' : ''
+      } ${compact ? 'gap-1 px-2 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'}`}
     >
       <MapPin className={`text-sky-300 shrink-0 ${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
       <span className="truncate">{complet}</span>

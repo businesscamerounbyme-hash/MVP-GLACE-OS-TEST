@@ -96,7 +96,7 @@ export default function OfferCard({
           )}
         </Link>
 
-        <Adresse ville={boutique.ville} distanceKm={boutique.distanceKm} taille="compact" />
+        <Adresse ville={boutique.ville} distanceKm={boutique.distanceKm} taille="compact" cliquable />
       </div>
 
       {/* Compare button */}

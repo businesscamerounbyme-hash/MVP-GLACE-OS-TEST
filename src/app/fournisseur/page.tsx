@@ -389,7 +389,7 @@ export default function FournisseurDashboard() {
           </h1>
           {boutique ? (
             <div className="mt-1">
-              <Adresse ville={boutique.ville} pays={boutique.pays} quartier={boutique.quartier} />
+              <Adresse ville={boutique.ville} pays={boutique.pays} quartier={boutique.quartier} cliquable />
             </div>
           ) : (
             <p className="text-xs text-slate-400">

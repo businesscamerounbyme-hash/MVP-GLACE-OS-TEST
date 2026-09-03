@@ -194,6 +194,7 @@ export default function ProductComparatorDetailPage() {
                       pays={offre.boutique.pays}
                       quartier={offre.boutique.quartier}
                       distanceKm={offre.boutique.distanceKm}
+                      cliquable
                     />
 
                     {offre.description && (

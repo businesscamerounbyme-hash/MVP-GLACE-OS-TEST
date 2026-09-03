@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { 
   Store, 
   MapPin, 
@@ -18,8 +19,21 @@ import ShopCard from '@/components/marketplace/ShopCard';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 
 export default function BoutiquesPage() {
+  return (
+    <Suspense fallback={null}>
+      <ListeBoutiques />
+    </Suspense>
+  );
+}
+
+function ListeBoutiques() {
+  const searchParams = useSearchParams();
+  // Une adresse cliquee ailleurs sur le site arrive ici sous forme de ?ville=...
+  // La valeur initialise le filtre, qui reste modifiable ensuite.
+  const villeInitiale = searchParams.get('ville') || 'Toutes';
+
   const [boutiques, setBoutiques] = useState<any[]>([]);
-  const [selectedCity, setSelectedCity] = useState<string>('Toutes');
+  const [selectedCity, setSelectedCity] = useState<string>(villeInitiale);
   const [selectedCountry, setSelectedCountry] = useState<string>('Tous');
   const [onlyCertified, setOnlyCertified] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -134,6 +148,14 @@ export default function BoutiquesPage() {
               className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-amber-400"
             >
               <option value="Toutes">🌍 Toutes les villes</option>
+              {/* Les villes sont saisies librement par les fournisseurs : celle qui
+                  arrive par l'URL peut ne pas figurer dans la liste de référence. Sans
+                  cette entrée, le filtre s'appliquerait sans que rien n'apparaisse
+                  sélectionné. */}
+              {selectedCity !== 'Toutes' &&
+                !VILLES_AFRIQUE.some((v) => v.nom === selectedCity) && (
+                  <option value={selectedCity}>{selectedCity}</option>
+                )}
               {VILLES_AFRIQUE.map((v) => (
                 <option key={v.nom} value={v.nom}>
                   {v.nom} ({v.pays})

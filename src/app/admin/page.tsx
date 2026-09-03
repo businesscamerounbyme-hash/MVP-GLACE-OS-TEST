@@ -265,7 +265,7 @@ export default function AdminDashboardPage() {
                     </span>
                     <h3 className="text-base font-extrabold text-white mt-1">{b.nom}</h3>
                     <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
-                      <Adresse ville={b.ville} pays={b.pays} quartier={b.quartier} taille="compact" />
+                      <Adresse ville={b.ville} pays={b.pays} quartier={b.quartier} taille="compact" cliquable />
                       <Phone className="w-3.5 h-3.5 text-slate-500" />
                       <span>{b.telephone} / WA: {b.whatsapp}</span>
                     </div>

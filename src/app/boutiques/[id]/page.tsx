@@ -180,6 +180,7 @@ export default function BoutiqueDetailPage() {
                 pays={boutique.pays}
                 quartier={boutique.quartier}
                 distanceKm={boutique.distanceKm}
+                cliquable
               />
 
               {boutique.badgeCertifie ? (
