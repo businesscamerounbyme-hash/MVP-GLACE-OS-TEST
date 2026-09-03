@@ -78,7 +78,8 @@ export default function BoutiqueDetailPage() {
   const handleSubmitAvis = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
-      router.push('/login');
+      // On revient sur cette fiche apres connexion, plutot que de perdre le contexte.
+      router.push(`/login?suite=/boutiques/${boutiqueId}`);
       return;
     }
 
@@ -307,18 +308,59 @@ export default function BoutiqueDetailPage() {
                   </div>
                 </div>
 
-                {/* Unlock CTA */}
-                <button
-                  onClick={() => setIsMoMoModalOpen(true)}
-                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2"
-                >
-                  <Zap className="w-4 h-4 fill-slate-950" />
-                  <span>Débloquer le contact (2 000 FCFA/mois)</span>
-                </button>
+                {/* Un visiteur non connecté ne peut pas s'abonner : le paiement se
+                    rattache à un compte. Lui proposer de payer d'abord le menait à un
+                    refus « Authentification requise » qu'il n'avait aucun moyen de
+                    comprendre. On lui demande donc d'abord d'ouvrir un compte, et
+                    l'abonnement ne lui est présenté qu'ensuite. */}
+                {!currentUser ? (
+                  <div className="space-y-2.5">
+                    <p className="text-[11px] text-slate-300 text-center leading-relaxed">
+                      <strong className="text-white">Étape 1 sur 2 :</strong> créez votre
+                      compte glacier, gratuit, pour accéder aux fournisseurs.
+                    </p>
 
-                <p className="text-[10px] text-slate-500 text-center leading-tight">
-                  Paiement instantané Orange Money, MTN MoMo ou Wave
-                </p>
+                    <Link
+                      href={`/register?suite=/boutiques/${boutiqueId}`}
+                      className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Créer mon compte gratuit</span>
+                    </Link>
+
+                    <Link
+                      href={`/login?suite=/boutiques/${boutiqueId}`}
+                      className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition flex items-center justify-center gap-2"
+                    >
+                      J’ai déjà un compte — me connecter
+                    </Link>
+
+                    <p className="text-[10px] text-slate-500 text-center leading-tight">
+                      L’abonnement qui débloque les contacts vous sera proposé ensuite.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    <p className="text-[11px] text-slate-300 text-center leading-relaxed">
+                      <strong className="text-white">Dernière étape :</strong> l’abonnement
+                      membre débloque les contacts de{' '}
+                      <strong className="text-white">toutes</strong> les boutiques, pas
+                      seulement celle-ci.
+                    </p>
+
+                    <button
+                      onClick={() => setIsMoMoModalOpen(true)}
+                      className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2"
+                    >
+                      <Zap className="w-4 h-4 fill-slate-950" />
+                      <span>Débloquer le contact (2 000 FCFA/mois)</span>
+                    </button>
+
+                    <p className="text-[10px] text-slate-500 text-center leading-tight">
+                      Paiement instantané Orange Money, MTN MoMo ou Wave
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

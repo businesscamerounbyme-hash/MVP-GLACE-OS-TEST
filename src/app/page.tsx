@@ -38,6 +38,16 @@ export default function HomePage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMoMoModalOpen, setIsMoMoModalOpen] = useState(false);
+  const [utilisateur, setUtilisateur] = useState<any>(null);
+
+  // Session chargee a part : elle ne depend pas des filtres, contrairement aux
+  // donnees, et n a donc pas a etre redemandee a chaque changement de ville.
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => setUtilisateur(d.user ?? null))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     // Tenter de géolocaliser l'utilisateur avec consentement
@@ -376,13 +386,25 @@ export default function HomePage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsMoMoModalOpen(true)}
-          className="w-full sm:w-auto shrink-0 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition flex items-center justify-center gap-2"
-        >
-          <Zap className="w-4 h-4 fill-slate-950" />
-          <span>S'abonner via Mobile Money</span>
-        </button>
+        {/* Même règle que sur la fiche boutique : l'abonnement se rattache à un compte,
+            donc on ne propose de payer qu'à quelqu'un qui en a un. */}
+        {utilisateur ? (
+          <button
+            onClick={() => setIsMoMoModalOpen(true)}
+            className="w-full sm:w-auto shrink-0 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition flex items-center justify-center gap-2"
+          >
+            <Zap className="w-4 h-4 fill-slate-950" />
+            <span>S'abonner via Mobile Money</span>
+          </button>
+        ) : (
+          <Link
+            href="/register"
+            className="w-full sm:w-auto shrink-0 py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/20 hover:scale-105 transition flex items-center justify-center gap-2"
+          >
+            <Zap className="w-4 h-4 fill-slate-950" />
+            <span>Créer mon compte gratuit</span>
+          </Link>
+        )}
       </section>
 
       {/* Modal Mobile Money */}

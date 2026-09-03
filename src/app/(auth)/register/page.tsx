@@ -1,14 +1,24 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { Sparkles, User, Store, Mail, Phone, Lock, MapPin, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { suggestionsVilles } from '@/lib/villes';
 import { useSuggestionsVilles } from '@/lib/villes-client';
+import { useSearchParams } from 'next/navigation';
 import { useRedirectionSiConnecte } from '@/lib/session-client';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <FormulaireInscription />
+    </Suspense>
+  );
+}
+
+function FormulaireInscription() {
+  const searchParams = useSearchParams();
   useRedirectionSiConnecte();
   const [role, setRole] = useState<'MEMBER' | 'SUPPLIER'>('MEMBER');
   const [nom, setNom] = useState('');
@@ -103,7 +113,14 @@ export default function RegisterPage() {
         // navigation interne ne la remonte pas, et `router.refresh()` ne rejoue que
         // les composants serveur — l'utilisateur restait donc affiché comme déconnecté
         // jusqu'à ce qu'il recharge la page à la main.
-        window.location.assign(role === 'SUPPLIER' ? '/fournisseur' : '/');
+        // Retour a la page qui a envoye l utilisateur ici — typiquement une fiche
+        // boutique dont il voulait les coordonnees. Chemins internes uniquement :
+        // une URL absolue permettrait de le rediriger vers un site tiers.
+        const suite = searchParams.get("suite");
+        const interne = suite && suite.startsWith("/") && !suite.startsWith("//");
+        window.location.assign(
+          interne ? suite : role === 'SUPPLIER' ? '/fournisseur' : '/'
+        );
       }, 1500);
 
     } catch (err: any) {
