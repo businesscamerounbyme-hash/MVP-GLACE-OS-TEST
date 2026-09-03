@@ -7,6 +7,12 @@ interface Props {
   taille?: 'normal' | 'compact';
   /** Nom de ce qui est compté, au singulier. « offre » par défaut. */
   libelle?: string;
+  /**
+   * `court` omet « disponibles ». À réserver aux emplacements déjà intitulés, comme
+   * la colonne « Produits » d'une carte : le texte complet y dépasse de sa colonne
+   * et comprime les voisines.
+   */
+  format?: 'long' | 'court';
 }
 
 /**
@@ -19,8 +25,14 @@ interface Props {
  * À zéro, l'animation disparaît : elle doit signaler une disponibilité réelle, sinon
  * elle attire l'attention sur un produit qu'on ne peut pas acheter.
  */
-export default function BadgeOffres({ nombre, taille = 'normal', libelle = 'offre' }: Props) {
-  const pluriel = nombre > 1 ? `${libelle}s disponibles` : `${libelle} disponible`;
+export default function BadgeOffres({
+  nombre,
+  taille = 'normal',
+  libelle = 'offre',
+  format = 'long',
+}: Props) {
+  const accord = nombre > 1 ? `${libelle}s` : libelle;
+  const pluriel = format === 'court' ? accord : `${accord} ${nombre > 1 ? 'disponibles' : 'disponible'}`;
   const compact = taille === 'compact';
 
   if (nombre <= 0) {

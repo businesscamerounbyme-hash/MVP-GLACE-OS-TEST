@@ -67,7 +67,9 @@ export default function ShopCard({
       </div>
 
       {/* Metrics: Note, Offres, Distance */}
-      <div className="grid grid-cols-3 gap-2 py-2.5 px-3 rounded-2xl bg-slate-950/60 border border-slate-800/60 text-center mb-3">
+      {/* Colonnes latérales de largeur égale, centrale libre : en trois tiers stricts,
+          le badge dépassait de sa colonne et écrasait « Proximité » sur la droite. */}
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 py-2.5 px-3 rounded-2xl bg-slate-950/60 border border-slate-800/60 text-center mb-3">
         <div>
           <span className="text-[10px] text-slate-500 block uppercase font-bold">Note</span>
           <div className="flex items-center justify-center gap-1 mt-0.5">
@@ -81,7 +83,7 @@ export default function ShopCard({
         <div>
           <span className="text-[10px] text-slate-500 block uppercase font-bold">Produits</span>
           <span className="block mt-0.5">
-            <BadgeOffres nombre={offresCount} taille="compact" />
+            <BadgeOffres nombre={offresCount} taille="compact" format="court" />
           </span>
         </div>
 
