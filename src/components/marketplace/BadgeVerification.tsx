@@ -14,8 +14,9 @@ interface Props {
  * l'option payante inutile — pourquoi payer pour être « certifié » quand on est déjà
  * annoncé « vérifié » ?
  *
- * Deux états franchement opposés désormais : doré pour la boutique certifiée,
- * ambre d'alerte pour celle qui ne l'est pas.
+ * Deux états franchement opposés désormais : vert pour la boutique certifiée — la
+ * couleur porte ici le gage de confiance, qui est le signal le plus important du
+ * site — et rouge pour celle qui ne l'est pas.
  */
 export default function BadgeVerification({ certifie, taille = 'normal' }: Props) {
   const compact = taille === 'compact';
@@ -27,9 +28,9 @@ export default function BadgeVerification({ certifie, taille = 'normal' }: Props
   if (certifie) {
     return (
       <span
-        className={`shrink-0 inline-flex items-center rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-extrabold tracking-wide uppercase gold-glow ${dimensions}`}
+        className={`shrink-0 inline-flex items-center rounded-full bg-emerald-500/25 text-emerald-100 border border-emerald-400/60 font-extrabold tracking-wide uppercase certifie-glow ${dimensions}`}
       >
-        <ShieldCheck className={`text-amber-400 ${icone}`} />
+        <ShieldCheck className={`text-emerald-300 ${icone}`} />
         <span>Certifié</span>
       </span>
     );

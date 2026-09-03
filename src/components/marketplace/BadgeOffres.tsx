@@ -54,15 +54,15 @@ export default function BadgeOffres({
       }`}
     >
       <span className={`relative flex shrink-0 ${compact ? 'h-1.5 w-1.5' : 'h-2 w-2'}`}>
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-85" />
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-85" />
         <span
-          className={`relative inline-flex rounded-full bg-emerald-400 ${
+          className={`relative inline-flex rounded-full bg-amber-300 ${
             compact ? 'h-1.5 w-1.5' : 'h-2 w-2'
           }`}
         />
       </span>
 
-      <span className="text-emerald-100 drop-shadow-sm whitespace-nowrap">
+      <span className="text-amber-50 drop-shadow-sm whitespace-nowrap">
         <strong className={`text-white font-black ${compact ? 'text-[11px]' : 'text-xs'}`}>
           {nombre}
         </strong>{' '}
@@ -70,7 +70,7 @@ export default function BadgeOffres({
       </span>
 
       <Sparkles
-        className={`text-amber-300 animate-spin-slow shrink-0 ${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`}
+        className={`text-white animate-spin-slow shrink-0 ${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`}
       />
     </span>
   );
