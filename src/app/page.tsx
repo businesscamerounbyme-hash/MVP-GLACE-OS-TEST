@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import OfferCard from '@/components/marketplace/OfferCard';
 import ShopCard from '@/components/marketplace/ShopCard';
+import BadgeOffres from '@/components/marketplace/BadgeOffres';
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 
@@ -285,9 +286,13 @@ export default function HomePage() {
               className="glass-card glass-card-hover rounded-2xl p-4 flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between text-[10px] font-bold text-amber-400 mb-2">
-                  <span className="uppercase">{prod.sousCategorie}</span>
-                  <span className="text-slate-400 font-mono">{prod.offresCount} offres</span>
+                <div className="flex items-center justify-between gap-2 mb-2.5">
+                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider truncate">
+                    {prod.sousCategorie}
+                  </span>
+                  {/* Variante compacte : les cartes de l'accueil sont plus étroites que
+                      celles du comparateur, mais le signal doit rester le même. */}
+                  <BadgeOffres nombre={prod.offresCount} taille="compact" />
                 </div>
                 <h3 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-2">
                   {prod.nom}

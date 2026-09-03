@@ -12,9 +12,9 @@ import {
   ChevronRight, 
   ShieldCheck,
   Loader2,
-  Filter,
-  Sparkles
+  Filter
 } from 'lucide-react';
+import BadgeOffres from '@/components/marketplace/BadgeOffres';
 import OfferCard from '@/components/marketplace/OfferCard';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 
@@ -120,23 +120,7 @@ export default function ComparateurPage() {
                     {prod.sousCategorie}
                   </span>
 
-                  {prod.offresCount > 0 ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold badge-scintillant text-white shadow-md">
-                      <span className="relative flex h-2 w-2 shrink-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-85"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-                      </span>
-                      <span className="text-emerald-100 drop-shadow-sm whitespace-nowrap">
-                        <strong className="text-white font-black text-xs">{prod.offresCount}</strong>{' '}
-                        {prod.offresCount > 1 ? 'offres disponibles' : 'offre disponible'}
-                      </span>
-                      <Sparkles className="w-3 h-3 text-amber-300 animate-spin-slow shrink-0" />
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-900/80 border border-slate-800 text-slate-500">
-                      0 offre disponible
-                    </span>
-                  )}
+                  <BadgeOffres nombre={prod.offresCount} />
                 </div>
 
                 <h3 className="font-extrabold text-base text-white group-hover:text-amber-400 transition-colors line-clamp-2">

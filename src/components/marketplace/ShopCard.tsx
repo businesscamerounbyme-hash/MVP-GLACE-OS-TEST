@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Store, MapPin, Star, ShieldCheck, ChevronRight, Phone, MessageCircle } from 'lucide-react';
+import BadgeOffres from './BadgeOffres';
 
 interface ShopCardProps {
   id: string;
@@ -82,8 +83,8 @@ export default function ShopCard({
 
         <div>
           <span className="text-[10px] text-slate-500 block uppercase font-bold">Produits</span>
-          <span className="text-xs font-black text-emerald-400 block mt-0.5">
-            {offresCount} offres
+          <span className="block mt-0.5">
+            <BadgeOffres nombre={offresCount} taille="compact" />
           </span>
         </div>
 
