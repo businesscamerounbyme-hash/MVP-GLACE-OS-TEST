@@ -109,3 +109,99 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, message: 'Erreur suppression' }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const user = await getCurrentUser();
+    if (!user || user.role !== 'SUPPLIER') {
+      return NextResponse.json({ success: false, message: 'Accès réservé aux fournisseurs.' }, { status: 403 });
+    }
+
+    const boutique = await prisma.boutique.findFirst({
+      where: { utilisateurId: user.id }
+    });
+
+    if (!boutique) {
+      return NextResponse.json({ success: false, message: 'Boutique introuvable.' }, { status: 404 });
+    }
+
+    const body = await request.json();
+    const { id, produitReferenceId, prix, unite, quantiteDisponible, description } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: 'Identifiant de l’offre manquant.' }, { status: 400 });
+    }
+
+    const offreExistante = await prisma.offre.findFirst({
+      where: {
+        id,
+        boutiqueId: boutique.id,
+      },
+    });
+
+    if (!offreExistante) {
+      return NextResponse.json(
+        { success: false, message: 'Cette offre n’existe pas ou ne vous appartient pas.' },
+        { status: 404 }
+      );
+    }
+
+    const donneesMAJ: Record<string, any> = {};
+
+    if (produitReferenceId) {
+      const refProduit = await prisma.produitReference.findUnique({
+        where: { id: produitReferenceId },
+      });
+      if (!refProduit) {
+        return NextResponse.json(
+          { success: false, message: 'Produit de référence introuvable dans le catalogue officiel.' },
+          { status: 404 }
+        );
+      }
+      donneesMAJ.produitReferenceId = produitReferenceId;
+    }
+
+    if (prix !== undefined) {
+      const p = parseFloat(prix);
+      if (isNaN(p) || p <= 0) {
+        return NextResponse.json({ success: false, message: 'Le prix doit être un nombre positif.' }, { status: 400 });
+      }
+      donneesMAJ.prix = p;
+    }
+
+    if (unite !== undefined) {
+      const u = String(unite).trim();
+      if (!u) {
+        return NextResponse.json({ success: false, message: 'L’unité est obligatoire.' }, { status: 400 });
+      }
+      donneesMAJ.unite = u;
+    }
+
+    if (quantiteDisponible !== undefined) {
+      const q = parseFloat(quantiteDisponible);
+      donneesMAJ.quantiteDisponible = isNaN(q) || q < 0 ? 0 : q;
+    }
+
+    if (description !== undefined) {
+      donneesMAJ.description = description ? String(description).trim() : null;
+    }
+
+    const offreMAJ = await prisma.offre.update({
+      where: { id },
+      data: donneesMAJ,
+      include: {
+        produitReference: true,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      offre: offreMAJ,
+      message: 'Offre mise à jour avec succès !',
+    });
+  } catch (error: any) {
+    console.error('Erreur mise à jour offre:', error);
+    return NextResponse.json({ success: false, message: 'Erreur lors de la mise à jour de l’offre.' }, { status: 500 });
+  }
+}
+

@@ -12,7 +12,8 @@ import {
   ChevronRight, 
   ShieldCheck,
   Loader2,
-  Filter
+  Filter,
+  Sparkles
 } from 'lucide-react';
 import OfferCard from '@/components/marketplace/OfferCard';
 import { VILLES_AFRIQUE } from '@/lib/geo';
@@ -114,9 +115,28 @@ export default function ComparateurPage() {
               className="glass-card glass-card-hover rounded-3xl p-5 flex flex-col justify-between group"
             >
               <div>
-                <div className="flex items-center justify-between text-[10px] font-bold text-amber-400 uppercase mb-2">
-                  <span>{prod.sousCategorie}</span>
-                  <span className="text-slate-400 font-mono">{prod.offresCount} offres disponibles</span>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 shrink-0">
+                    {prod.sousCategorie}
+                  </span>
+
+                  {prod.offresCount > 0 ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold badge-scintillant text-white shadow-md">
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-85"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                      </span>
+                      <span className="text-emerald-100 drop-shadow-sm whitespace-nowrap">
+                        <strong className="text-white font-black text-xs">{prod.offresCount}</strong>{' '}
+                        {prod.offresCount > 1 ? 'offres disponibles' : 'offre disponible'}
+                      </span>
+                      <Sparkles className="w-3 h-3 text-amber-300 animate-spin-slow shrink-0" />
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-900/80 border border-slate-800 text-slate-500">
+                      0 offre disponible
+                    </span>
+                  )}
                 </div>
 
                 <h3 className="font-extrabold text-base text-white group-hover:text-amber-400 transition-colors line-clamp-2">

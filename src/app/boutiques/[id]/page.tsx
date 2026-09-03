@@ -20,7 +20,8 @@ import {
   Loader2,
   Calendar,
   Send,
-  User
+  User,
+  Pencil
 } from 'lucide-react';
 import OfferCard from '@/components/marketplace/OfferCard';
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
@@ -133,17 +134,35 @@ export default function BoutiqueDetailPage() {
     );
   }
 
+  const isOwner = Boolean(
+    currentUser &&
+      boutique &&
+      (currentUser.id === boutique.utilisateurId || currentUser.id === boutique.utilisateur?.id)
+  );
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16">
       
-      {/* Back button */}
-      <Link
-        href="/boutiques"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Retour aux boutiques</span>
-      </Link>
+      {/* Top Bar */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/boutiques"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Retour aux boutiques</span>
+        </Link>
+
+        {isOwner && (
+          <Link
+            href="/fournisseur"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/30 transition"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            <span>Modifier ma boutique</span>
+          </Link>
+        )}
+      </div>
 
       {/* BOUTIQUE HEADER HERO */}
       <div className="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 relative overflow-hidden">
