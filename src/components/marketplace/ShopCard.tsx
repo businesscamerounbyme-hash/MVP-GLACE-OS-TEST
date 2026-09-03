@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Store, MapPin, Star, ShieldCheck, ChevronRight, Phone, MessageCircle } from 'lucide-react';
 import BadgeOffres from './BadgeOffres';
 import Adresse from './Adresse';
+import BadgeVerification from './BadgeVerification';
 
 interface ShopCardProps {
   id: string;
@@ -51,16 +52,8 @@ export default function ShopCard({
           <Adresse ville={ville} distanceKm={distanceKm} taille="compact" />
         </span>
 
-        {badgeCertifie ? (
-          <span className="shrink-0 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-extrabold tracking-wide uppercase gold-glow">
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>Certifié</span>
-          </span>
-        ) : (
-          <span className="shrink-0 text-[10px] font-semibold text-slate-500 bg-slate-800/80 px-2 py-0.5 rounded-full">
-            Vérifié
-          </span>
-        )}
+        <BadgeVerification certifie={badgeCertifie} taille="compact" />
+
       </div>
 
       {/* Shop Name & Description */}

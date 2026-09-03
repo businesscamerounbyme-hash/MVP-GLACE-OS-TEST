@@ -29,6 +29,7 @@ import {
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 import Adresse from '@/components/marketplace/Adresse';
+import BadgeVerification from '@/components/marketplace/BadgeVerification';
 import { useSuggestionsVilles } from '@/lib/villes-client';
 import { UserSession } from '@/types';
 
@@ -378,11 +379,7 @@ export default function FournisseurDashboard() {
             <span className="text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               Espace Fournisseur B2B
             </span>
-            {boutique?.badgeCertifie && (
-              <span className="flex items-center gap-1 text-xs font-bold text-amber-400">
-                <ShieldCheck className="w-4 h-4" /> Certifié
-              </span>
-            )}
+            {boutique && <BadgeVerification certifie={boutique.badgeCertifie} />}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">
             {boutique?.nom || 'Ma Boutique Fournisseur'}

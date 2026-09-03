@@ -21,9 +21,11 @@ import {
   Calendar,
   Send,
   User,
-  Pencil
+  Pencil,
+  ShieldAlert
 } from 'lucide-react';
 import Adresse from '@/components/marketplace/Adresse';
+import BadgeVerification from '@/components/marketplace/BadgeVerification';
 import OfferCard from '@/components/marketplace/OfferCard';
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import { UserSession } from '@/types';
@@ -165,6 +167,40 @@ export default function BoutiqueDetailPage() {
         )}
       </div>
 
+      {/* Avertissement de non-verification. Visible du proprietaire comme du visiteur,
+          mais avec un message different : l un doit agir, l autre doit se mefier. */}
+      {!boutique.badgeCertifie &&
+        (isOwner ? (
+          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <ShieldAlert className="w-6 h-6 text-amber-400 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-extrabold text-white">
+                Votre boutique n’est pas encore vérifiée
+              </p>
+              <p className="text-xs text-amber-200/90 mt-0.5">
+                Les visiteurs voient un avertissement sur votre fiche. Le badge certifié
+                le remplace par un gage de confiance et vous distingue des autres
+                fournisseurs de votre ville.
+              </p>
+            </div>
+            <Link
+              href="/fournisseur"
+              className="shrink-0 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-black text-xs whitespace-nowrap hover:scale-[1.02] transition"
+            >
+              Faire vérifier ma boutique
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-3.5 flex items-start gap-2.5">
+            <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-rose-200">
+              <strong className="text-rose-100">Boutique non vérifiée.</strong> Ce
+              fournisseur n’a pas fourni ses justificatifs à GLACE OS. Vérifiez son
+              identité avant tout paiement, et privilégiez un règlement à la livraison.
+            </p>
+          </div>
+        ))}
+
       {/* BOUTIQUE HEADER HERO */}
       <div className="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 relative overflow-hidden">
         {/* Glow */}
@@ -183,16 +219,7 @@ export default function BoutiqueDetailPage() {
                 cliquable
               />
 
-              {boutique.badgeCertifie ? (
-                <span className="flex items-center gap-1 text-xs font-extrabold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider gold-glow">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Fournisseur Certifié GLACE OS</span>
-                </span>
-              ) : (
-                <span className="text-xs text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-full font-medium">
-                  Boutique Vérifiée
-                </span>
-              )}
+              <BadgeVerification certifie={boutique.badgeCertifie} />
             </div>
 
             {/* Shop Name */}
