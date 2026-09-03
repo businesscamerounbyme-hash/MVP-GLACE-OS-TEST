@@ -63,7 +63,7 @@ export default function Adresse({
       <Link
         href={`/boutiques?ville=${encodeURIComponent(ville)}`}
         title={`Voir les boutiques à ${ville}`}
-        className="inline-flex hover:brightness-125 hover:scale-[1.03] active:scale-95 transition"
+        className="inline-flex max-w-full min-w-0 hover:brightness-125 hover:scale-[1.03] active:scale-95 transition"
       >
         {contenu}
       </Link>
@@ -74,7 +74,7 @@ export default function Adresse({
   if (variante === 'ligne') {
     return enrobe(
       <span
-        className={`inline-flex items-center gap-1.5 font-semibold text-sky-300 ${
+        className={`inline-flex items-center gap-1.5 font-semibold text-sky-300 max-w-full min-w-0 ${
           compact ? 'text-[11px]' : 'text-xs'
         }`}
       >
@@ -88,7 +88,7 @@ export default function Adresse({
 
   return enrobe(
     <span
-      className={`inline-flex items-center rounded-full adresse-scintillante text-white font-bold ${
+      className={`inline-flex items-center rounded-full adresse-scintillante text-white font-bold max-w-full min-w-0 ${
         cliquable ? 'cursor-pointer hover:brightness-125' : ''
       } ${compact ? 'gap-1 px-2 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'}`}
     >

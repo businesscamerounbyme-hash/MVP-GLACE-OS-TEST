@@ -42,15 +42,22 @@ export default function ShopCard({
     >
       {/* Top row: Badge and Location */}
       <div className="flex items-center justify-between gap-2 mb-3">
-        <Adresse ville={ville} pays={pays} quartier={quartier} distanceKm={distanceKm} taille="compact" />
+        {/* min-w-0 est indispensable : sans lui un enfant flex refuse de descendre
+            sous la largeur de son contenu, le `truncate` de l'adresse ne s'applique
+            jamais et la pastille pousse le badge certifié hors de la carte.
+            Seules la ville et la distance sont montrées ici — quartier et pays
+            allongeaient la pastille sans aider à choisir dans une liste. */}
+        <span className="min-w-0 shrink">
+          <Adresse ville={ville} distanceKm={distanceKm} taille="compact" />
+        </span>
 
         {badgeCertifie ? (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-extrabold tracking-wide uppercase gold-glow">
+          <span className="shrink-0 flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-extrabold tracking-wide uppercase gold-glow">
             <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>Fournisseur Certifié</span>
+            <span>Certifié</span>
           </span>
         ) : (
-          <span className="text-[10px] font-semibold text-slate-500 bg-slate-800/80 px-2 py-0.5 rounded-full">
+          <span className="shrink-0 text-[10px] font-semibold text-slate-500 bg-slate-800/80 px-2 py-0.5 rounded-full">
             Vérifié
           </span>
         )}
