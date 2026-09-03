@@ -248,6 +248,17 @@ export default function Navbar() {
                         </Link>
                       ) : null}
 
+                      {user.role === 'MEMBER' ? (
+                        <Link
+                          href="/devenir-fournisseur"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-xs text-emerald-300 hover:bg-emerald-500/10 rounded-xl transition"
+                        >
+                          <Store className="w-4 h-4 text-emerald-400" />
+                          Devenir fournisseur
+                        </Link>
+                      ) : null}
+
                       {user.role === 'SUPPLIER' ? (
                         <Link
                           href="/fournisseur"

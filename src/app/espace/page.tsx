@@ -90,6 +90,28 @@ export default function EspaceHubPage() {
 
       {/* Navigation shortcuts based on role */}
       <div className="space-y-3">
+        {user.role === "MEMBER" && (
+          <Link
+            href="/devenir-fournisseur"
+            className="glass-card glass-card-hover rounded-2xl p-4 border border-emerald-500/40 bg-emerald-500/5 flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <Store className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm text-white group-hover:text-emerald-300">
+                  Devenir fournisseur
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  Publiez votre boutique et vendez aux glaciers
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-emerald-400" />
+          </Link>
+        )}
+
         <Link
           href="/profil"
           className="glass-card glass-card-hover rounded-2xl p-4 border border-slate-700 flex items-center justify-between group"

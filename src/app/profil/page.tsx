@@ -11,6 +11,8 @@ import {
   Lock,
   Trash2,
   ArrowLeft,
+  ArrowRight,
+  Store,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSuggestionsVilles } from '@/lib/villes-client';
@@ -358,6 +360,29 @@ export default function ProfilPage() {
           </button>
         </form>
       </section>
+
+      {/* Passage fournisseur, proposé aux seuls membres */}
+      {user.role === "MEMBER" && (
+        <Link
+          href="/devenir-fournisseur"
+          className="glass-card glass-card-hover rounded-3xl p-5 border border-emerald-500/40 bg-emerald-500/5 flex items-center justify-between group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <Store className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-black text-white group-hover:text-emerald-300">
+                Devenir fournisseur
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                Créez votre boutique et proposez vos produits
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-emerald-400" />
+        </Link>
+      )}
 
       {/* Mot de passe */}
       <section className="glass-card rounded-3xl p-6 border border-slate-800 space-y-4">
