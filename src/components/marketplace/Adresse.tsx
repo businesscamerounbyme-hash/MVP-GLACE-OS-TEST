@@ -47,7 +47,7 @@ export default function Adresse({
   const distance =
     distanceKm !== undefined ? (
       <span
-        className={`inline-flex items-center gap-0.5 font-black text-sky-200 shrink-0 ${
+        className={`inline-flex items-center gap-0.5 font-black text-white drop-shadow-sm shrink-0 ${
           compact ? 'text-[10px]' : 'text-[11px]'
         }`}
       >
@@ -88,13 +88,17 @@ export default function Adresse({
 
   return enrobe(
     <span
-      className={`inline-flex items-center rounded-full bg-sky-500/15 border border-sky-400/40 text-sky-200 font-bold shadow-sm shadow-sky-500/10 ${
-        cliquable ? 'cursor-pointer hover:bg-sky-500/25 hover:border-sky-300/70' : ''
+      className={`inline-flex items-center rounded-full adresse-scintillante text-white font-bold ${
+        cliquable ? 'cursor-pointer hover:brightness-125' : ''
       } ${compact ? 'gap-1 px-2 py-0.5 text-[10px]' : 'gap-1.5 px-2.5 py-1 text-xs'}`}
     >
-      <MapPin className={`text-sky-300 shrink-0 ${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
-      <span className="truncate">{complet}</span>
-      {distance && <span className="text-sky-500/70">•</span>}
+      {/* Le fond défile : sans ombre portée, le texte devient illisible chaque fois que
+          la bande claire du dégradé passe dessous. */}
+      <MapPin
+        className={`text-sky-100 drop-shadow shrink-0 ${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'}`}
+      />
+      <span className="truncate text-white drop-shadow-sm">{complet}</span>
+      {distance && <span className="text-sky-100/70">•</span>}
       {distance}
     </span>
   );
