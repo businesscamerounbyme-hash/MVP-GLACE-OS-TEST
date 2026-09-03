@@ -23,6 +23,7 @@ import {
   User,
   Pencil
 } from 'lucide-react';
+import Adresse from '@/components/marketplace/Adresse';
 import OfferCard from '@/components/marketplace/OfferCard';
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import { UserSession } from '@/types';
@@ -174,10 +175,12 @@ export default function BoutiqueDetailPage() {
             
             {/* Badges row */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="flex items-center gap-1 text-xs text-slate-400 font-semibold bg-slate-950 px-3 py-1 rounded-full border border-slate-800">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                <span>{boutique.quartier ? `${boutique.quartier}, ` : ''}{boutique.ville} ({boutique.pays})</span>
-              </span>
+              <Adresse
+                ville={boutique.ville}
+                pays={boutique.pays}
+                quartier={boutique.quartier}
+                distanceKm={boutique.distanceKm}
+              />
 
               {boutique.badgeCertifie ? (
                 <span className="flex items-center gap-1 text-xs font-extrabold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider gold-glow">

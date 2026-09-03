@@ -109,7 +109,7 @@ export default function InteractiveMap({
               ${b.nom} ${isCertified ? '⭐' : ''}
             </div>
             <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">
-              📍 ${b.quartier ? b.quartier + ', ' : ''}${b.ville} (${b.pays})
+              <span style="color:#7dd3fc;font-weight:700">📍 ${b.quartier ? b.quartier + ', ' : ''}${b.ville} (${b.pays})</span>
             </div>
             <div style="font-size: 11px; color: #38bdf8; font-weight: bold; margin-bottom: 8px;">
               🍦 ${b.offresCount || 0} offres de glacerie disponibles

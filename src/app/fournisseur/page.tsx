@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import ChampTelephone from '@/components/forms/ChampTelephone';
+import Adresse from '@/components/marketplace/Adresse';
 import { useSuggestionsVilles } from '@/lib/villes-client';
 import { UserSession } from '@/types';
 
@@ -386,9 +387,15 @@ export default function FournisseurDashboard() {
           <h1 className="text-2xl sm:text-3xl font-black text-white">
             {boutique?.nom || 'Ma Boutique Fournisseur'}
           </h1>
-          <p className="text-xs text-slate-400">
-            {boutique?.quartier ? `${boutique.quartier}, ${boutique.ville} (${boutique.pays})` : 'Gérez vos offres rattachées au catalogue de référence et vos abonnements Mobile Money'}
-          </p>
+          {boutique ? (
+            <div className="mt-1">
+              <Adresse ville={boutique.ville} pays={boutique.pays} quartier={boutique.quartier} />
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400">
+              Gérez vos offres rattachées au catalogue de référence et vos abonnements Mobile Money
+            </p>
+          )}
         </div>
 
         {/* Boutons d'action (Modifier Boutique / Badge / Abonnement) */}

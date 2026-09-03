@@ -17,6 +17,7 @@ import {
   Phone,
   Layers
 } from 'lucide-react';
+import Adresse from '@/components/marketplace/Adresse';
 import { VILLES_AFRIQUE } from '@/lib/geo';
 
 export default function ProductComparatorDetailPage() {
@@ -188,13 +189,12 @@ export default function ProductComparatorDetailPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      <span>{offre.boutique.quartier ? `${offre.boutique.quartier}, ` : ''}{offre.boutique.ville} ({offre.boutique.pays})</span>
-                      {offre.boutique.distanceKm !== undefined && (
-                        <span className="text-amber-400 font-bold">• {offre.boutique.distanceKm} km</span>
-                      )}
-                    </div>
+                    <Adresse
+                      ville={offre.boutique.ville}
+                      pays={offre.boutique.pays}
+                      quartier={offre.boutique.quartier}
+                      distanceKm={offre.boutique.distanceKm}
+                    />
 
                     {offre.description && (
                       <p className="text-xs text-slate-400 pt-0.5">

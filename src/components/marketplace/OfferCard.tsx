@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Store, MapPin, Tag, ArrowRight, ShieldCheck } from 'lucide-react';
+import Adresse from './Adresse';
 
 interface OfferCardProps {
   id: string;
@@ -95,13 +96,7 @@ export default function OfferCard({
           )}
         </Link>
 
-        <div className="flex items-center gap-1 text-[11px] text-slate-400">
-          <MapPin className="w-3 h-3 text-slate-500" />
-          <span>{boutique.ville}</span>
-          {boutique.distanceKm !== undefined && (
-            <span className="text-amber-400 font-bold">({boutique.distanceKm} km)</span>
-          )}
-        </div>
+        <Adresse ville={boutique.ville} distanceKm={boutique.distanceKm} taille="compact" />
       </div>
 
       {/* Compare button */}

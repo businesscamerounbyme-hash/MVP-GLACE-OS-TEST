@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { UserSession } from '@/types';
 import GestionMarches from '@/components/admin/GestionMarches';
+import Adresse from '@/components/marketplace/Adresse';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -263,10 +264,9 @@ export default function AdminDashboardPage() {
                       Nouvelle Boutique en Attente
                     </span>
                     <h3 className="text-base font-extrabold text-white mt-1">{b.nom}</h3>
-                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      <span>{b.quartier ? `${b.quartier}, ` : ''}{b.ville} ({b.pays})</span>
-                      <Phone className="w-3.5 h-3.5 text-slate-500 ml-2" />
+                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
+                      <Adresse ville={b.ville} pays={b.pays} quartier={b.quartier} taille="compact" />
+                      <Phone className="w-3.5 h-3.5 text-slate-500" />
                       <span>{b.telephone} / WA: {b.whatsapp}</span>
                     </div>
                   </div>
