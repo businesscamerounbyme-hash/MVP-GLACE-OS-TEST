@@ -136,6 +136,23 @@ function FormulaireConnexion() {
             <span className="font-bold text-amber-400 block">⭐ Membre Abonné</span>
             <span className="text-[10px] text-slate-400">Contact débloqué</span>
           </button>
+
+          {/* Membre inscrit mais sans abonnement : c'est l'état dans lequel arrive
+              toute personne qui vient de créer son compte, et le seul qui montre
+              l'étape de paiement telle qu'elle la verra. */}
+          <button
+            type="button"
+            onClick={() =>
+              quickLogin(
+                'membre.gratuit@glacier-abidjan.com',
+                process.env.NEXT_PUBLIC_DEMO_PASSWORD || ''
+              )
+            }
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-400 text-left transition"
+          >
+            <span className="font-bold text-slate-300 block">🍦 Membre Gratuit</span>
+            <span className="text-[10px] text-slate-400">Sans abonnement</span>
+          </button>
         </div>
       </div>
       )}
