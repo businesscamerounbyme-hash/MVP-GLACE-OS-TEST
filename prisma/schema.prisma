@@ -60,6 +60,8 @@ model Boutique {
   avis                  Avis[]
   abonnements           AbonnementFournisseur[]
   demandesBadges        DemandeBadge[]
+  vues                  VueBoutique[]
+  contacts              ContactBoutique[]
 }
 
 model ProduitReference {
@@ -249,4 +251,46 @@ model MarchePays {
   dateMiseAJour  DateTime  @updatedAt
 
   @@index([ouvert])
+}
+
+/// Consultation d une fiche boutique.
+///
+/// Une ligne par visiteur, par boutique et par jour : la contrainte d unicite fait le
+/// dedoublonnage en base plutot qu en code, ce qui resiste aux rafraichissements en
+/// rafale comme aux requetes simultanees. Un compteur gonfle par des rechargements ne
+/// vaut rien pour le fournisseur qui paie son abonnement dessus.
+model VueBoutique {
+  id          String   @id @default(cuid())
+  boutiqueId  String
+  /// Identifiant de visiteur tire d un cookie aleatoire. Jamais l adresse IP :
+  /// la mesure d audience n a pas besoin d une donnee personnelle.
+  visiteurCle String
+  /// Jour au format AAAA-MM-JJ, porte par la contrainte d unicite.
+  jour        String
+  dateVue     DateTime @default(now())
+
+  boutique Boutique @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+
+  @@unique([boutiqueId, visiteurCle, jour])
+  @@index([boutiqueId, dateVue])
+}
+
+/// Contact reellement declenche vers un fournisseur : appel ou WhatsApp.
+///
+/// C est la metrique qui compte pour lui — une vue mesure la curiosite, un contact
+/// mesure une intention d achat. Dedoublonne par jour et par canal : la meme personne
+/// qui clique trois fois reste un seul prospect.
+model ContactBoutique {
+  id           String   @id @default(cuid())
+  boutiqueId   String
+  visiteurCle  String
+  /// TELEPHONE ou WHATSAPP.
+  canal        String
+  jour         String
+  dateContact  DateTime @default(now())
+
+  boutique Boutique @relation(fields: [boutiqueId], references: [id], onDelete: Cascade)
+
+  @@unique([boutiqueId, visiteurCle, canal, jour])
+  @@index([boutiqueId, dateContact])
 }

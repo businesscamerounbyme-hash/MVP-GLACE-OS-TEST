@@ -29,6 +29,7 @@ import {
 import MobileMoneyModal from '@/components/payment/MobileMoneyModal';
 import ChampTelephone from '@/components/forms/ChampTelephone';
 import Adresse from '@/components/marketplace/Adresse';
+import Statistiques from '@/components/fournisseur/Statistiques';
 import BadgeVerification from '@/components/marketplace/BadgeVerification';
 import { useSuggestionsVilles } from '@/lib/villes-client';
 import { UserSession } from '@/types';
@@ -525,6 +526,10 @@ export default function FournisseurDashboard() {
           </button>
         </div>
       )}
+
+      {/* Audience placée avant les formulaires : c'est ce qu'un fournisseur vient
+          voir en premier quand il se connecte, et ce qui l'incite à publier davantage. */}
+      <Statistiques />
 
       {/* AJOUTER UNE OFFRE RATTACHÉE AU CATALOGUE DE RÉFÉRENCE */}
       <section className="glass-card rounded-3xl p-6 border border-slate-800 space-y-5">

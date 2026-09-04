@@ -61,6 +61,21 @@ export default function BoutiqueDetailPage() {
     }
   };
 
+  // Enregistrement de la consultation. En arriere-plan et sans blocage : une
+  // statistique ne doit jamais retarder ni empecher l affichage de la fiche.
+  useEffect(() => {
+    if (!boutiqueId) return;
+    fetch(`/api/boutiques/${boutiqueId}/vue`, { method: "POST" }).catch(() => {});
+  }, [boutiqueId]);
+
+  const noterContact = (canal: "TELEPHONE" | "WHATSAPP") => {
+    fetch(`/api/boutiques/${boutiqueId}/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ canal }),
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     // Session
     fetch('/api/auth/me')
@@ -272,6 +287,7 @@ export default function BoutiqueDetailPage() {
               <div className="space-y-2.5">
                 {/* WhatsApp button */}
                 <a
+                  onClick={() => noterContact("WHATSAPP")}
                   href={`https://wa.me/${boutique.whatsapp?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${boutique.nom}, je vous contacte via la marketplace GLACE OS au sujet de vos produits de glacerie.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -283,6 +299,7 @@ export default function BoutiqueDetailPage() {
 
                 {/* Direct Call */}
                 <a
+                  onClick={() => noterContact("TELEPHONE")}
                   href={`tel:${boutique.telephone}`}
                   className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition"
                 >
