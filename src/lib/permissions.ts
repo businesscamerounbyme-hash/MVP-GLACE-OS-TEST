@@ -12,6 +12,39 @@ function peutVoirContacts(boutique: any, user: UserSession | null): boolean {
 }
 
 /**
+ * Masque un nom en gardant son premier mot.
+ *
+ * Le premier mot suffit à reconnaître une boutique qu'on cherche, et laisse la liste
+ * lisible ; les suivants, eux, la rendraient identifiable auprès de n'importe qui en
+ * ville — ce qui permettrait de contourner l'abonnement en allant simplement demander
+ * l'adresse sur place.
+ *
+ * La longueur des mots et la ponctuation sont conservées : le masque doit ressembler
+ * à un nom, pas à un bloc opaque.
+ */
+/**
+ * Arrondit une coordonnee pour les non-abonnes.
+ *
+ * Masquer le nom et le quartier ne servirait a rien en laissant passer les
+ * coordonnees exactes : elles sont plus precises encore, et il suffirait de les
+ * coller dans une carte pour se rendre sur place. Un arrondi au centieme de degre
+ * place le point dans le bon secteur — la carte garde son interet — sans designer
+ * la boutique.
+ */
+function flouterCoordonnee(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
+function masquerNom(nom: string): string {
+  const mots = nom.trim().split(/\s+/);
+  if (mots.length <= 1) return nom;
+  return [
+    mots[0],
+    ...mots.slice(1).map((mot) => mot.replace(/[\p{L}\p{N}]/gu, '•')),
+  ].join(' ');
+}
+
+/**
  * Projette une boutique vers l'extérieur en **liste blanche**.
  *
  * L'implémentation précédente recopiait l'objet entier (`...boutique`) puis masquait
@@ -27,13 +60,17 @@ export function sanitizeBoutiqueForUser(boutique: any, user: UserSession | null)
 
   const base = {
     id: boutique.id,
-    nom: boutique.nom,
+    // Nom et quartier masques tant que labonnement nest pas actif : ensemble, ils
+    // suffisent a retrouver le fournisseur sur place et rendraient labonnement
+    // inutile. La ville, elle, reste visible — elle porte la recherche et les
+    // filtres, et une ville entiere est trop vaste pour localiser une boutique.
+    nom: deverrouille ? boutique.nom : masquerNom(boutique.nom),
     description: boutique.description,
     pays: boutique.pays,
     ville: boutique.ville,
-    quartier: boutique.quartier,
-    latitude: boutique.latitude,
-    longitude: boutique.longitude,
+    quartier: deverrouille ? boutique.quartier : null,
+    latitude: deverrouille ? boutique.latitude : flouterCoordonnee(boutique.latitude),
+    longitude: deverrouille ? boutique.longitude : flouterCoordonnee(boutique.longitude),
     statut: boutique.statut,
     badgeCertifie: boutique.badgeCertifie,
     noteMoyenne: boutique.noteMoyenne,
